@@ -1,2 +1,0 @@
-# ACCIDENTS-MD
-
