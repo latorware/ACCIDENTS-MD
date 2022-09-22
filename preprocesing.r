@@ -81,7 +81,7 @@ summary(Prov)
 summary(Vel)
 #pie(table(Vel))
 #barplot(table(Vel))
-#No cal canviar res (missings es tracten més endavant...). Levels ja ordenats
+#No cal canviar res (missings es tracten m?s endavant...). Levels ja ordenats
 summary(Vel)
 
 summary(Escaped)
@@ -197,3 +197,40 @@ dd[,2]<-Date
 
 sapply(dd, class)
 sapply(dd, levels)
+
+
+
+table(dd$Zone)
+table(dd$Date)
+table(dd$Region)
+table(dd$Prov)
+table(dd$nMortal)
+table(dd$nGraveInj)
+table(dd$nMinorInj)
+table(dd$nInv)
+table(dd$nPedest)
+table(dd$nBikes)
+table(dd$nMotor)
+table(dd$Vel)
+dd$Vel[dd$Vel==999 |dd$Vel==0 ]  <- "NA" 
+table(dd$Escaped)
+table(dd$Weather)
+table(dd$TrafficInf)
+table(dd$WeatherInf)
+table(dd$LightInf)
+table(dd$VisionInf)
+table(dd$Intersect)
+table(dd$Surface)
+table(dd$DayGroup)
+table(dd$HourGroup)
+table(dd$AccType)
+
+
+
+install.packages("remotes")
+remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
+library(naniar)
+mcar_test(dd) 
+#1a columna: Chi-squared statistic for Little's test, 2a columna:Degrees of freedom used for chi-squared statistic
+#3a columna: P-value for the chi-squared statistic y 4a columna: Number of missing data patterns in the data
+
