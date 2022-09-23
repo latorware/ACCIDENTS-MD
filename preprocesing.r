@@ -1,3 +1,4 @@
+
 #CHECKEJA LA INSTALACIO DELS PACKAGES NECESARIS
 list.of.packages <- c("rstudioapi","remotes") #posar els packages que es facin servir
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -198,7 +199,8 @@ dd[,2]<-Date
 sapply(dd, class)
 sapply(dd, levels)
 
-
+saveRDS(dd, file= "dd.rds")
+#write.table(dd, file = "Preprocesed.csv", sep = ";", row.names = FALSE, col.names = TRUE)
 
 table(dd$Zone)
 table(dd$Date)
@@ -212,7 +214,10 @@ table(dd$nPedest)
 table(dd$nBikes)
 table(dd$nMotor)
 table(dd$Vel)
-dd$Vel[dd$Vel==999 |dd$Vel==0 ]  <- "NA" 
+dd$Vel <- factor(Vel, ordered=TRUE, levels=c(levels(dd$Vel), 'Unknown'))
+dd$Vel[dd$Vel==999 |dd$Vel==0 | is.na(dd$Vel)]  <- 'Unknown'
+dd$Vel[is.na(dd$Vel)]  <- 'Unknown'
+dd$Vel <- factor(Vel, ordered=TRUE, levels=levels(droplevels(dd$Vel)))
 table(dd$Escaped)
 table(dd$Weather)
 table(dd$TrafficInf)
@@ -224,6 +229,11 @@ table(dd$Surface)
 table(dd$DayGroup)
 table(dd$HourGroup)
 table(dd$AccType)
+
+da <- subset(dd, Vel == "NA's")
+
+
+
 
 remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
 library(naniar)
