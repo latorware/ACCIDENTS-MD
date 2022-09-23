@@ -1,5 +1,5 @@
 #CHECKEJA LA INSTALACIO DELS PACKAGES NECESARIS
-list.of.packages <- c("rstudioapi") #posar els packages que es facin servir
+list.of.packages <- c("rstudioapi","remotes") #posar els packages que es facin servir
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
@@ -225,9 +225,6 @@ table(dd$DayGroup)
 table(dd$HourGroup)
 table(dd$AccType)
 
-
-
-install.packages("remotes")
 remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
 library(naniar)
 mcar_test(dd) 
