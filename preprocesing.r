@@ -235,9 +235,9 @@ da <- subset(dd, Vel == "NA's")
 
 
 
-remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
-library(naniar)
-mcar_test(dd) 
+#remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
+#library(naniar)
+#mcar_test(dd) 
 #1a columna: Chi-squared statistic for Little's test, 2a columna:Degrees of freedom used for chi-squared statistic
 #3a columna: P-value for the chi-squared statistic y 4a columna: Number of missing data patterns in the data
 
