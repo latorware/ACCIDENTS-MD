@@ -65,12 +65,20 @@ summary(Zone)
 levels(Zone) <- c("Road", "Urban")
 summary(Zone)
 
+
+
 summary(Region)
+tochange<- PREPROCESSINGjoin <- read.csv("F:\\ACCIDENTS-MD\\PREPROCESSINGjoin.csv", sep=";")
+table(dd$Region)
+dd$Region<-tochange$Short[match(dd$Region,tochange$Long)]
+# detach(dd)
+#attach(dd)
+#Region     <- factor(dd$Region)
+#dd[,3]<-Region
 #pie(table(Region))
 #barplot(table(Region))
-#nomes canviar les que tenen accents
-levels(Region)[22] <- "Moianes"
 summary(Region)
+table(dd$Region)
 
 summary(Prov)
 #pie(table(Prov))
