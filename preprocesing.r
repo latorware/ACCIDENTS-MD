@@ -68,17 +68,16 @@ summary(Zone)
 
 
 summary(Region)
-tochange<- PREPROCESSINGjoin <- read.csv("F:\\ACCIDENTS-MD\\PREPROCESSINGjoin.csv", sep=";")
+levels(Region)[22] <- "Moianes"
+dd[,3]<-Region
 table(dd$Region)
-dd$Region<-tochange$Short[match(dd$Region,tochange$Long)]
-# detach(dd)
-#attach(dd)
-#Region     <- factor(dd$Region)
+tochange<- PREPROCESSINGjoin <- read.csv("PREPROCESSINGjoin.csv", sep=";")
+dd$Region<-tochange$Short[match(dd$Region,tochange$Long)] 
+Region     <- factor(dd$Region)
 #dd[,3]<-Region
 #pie(table(Region))
 #barplot(table(Region))
 summary(Region)
-table(dd$Region)
 
 summary(Prov)
 #pie(table(Prov))
