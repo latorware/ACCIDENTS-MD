@@ -16,18 +16,18 @@ output: word_document
 
 Here you can write the introduction of your report and include some text that will be transferred to the word file every time you re-run this Markdown
 
-<br> <!-- salt de linia com HTML -->
+<br>
 
 //Escriure INTRO
 
 
-<!-- WARNING: data must have been properly declared before (factors, dates...) creating the CSV -->
+<!-- WARNING: data must have been properly declared before (factors, dates...) -->
 
 ```{r, echo=FALSE}
 #READ TABLE
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
-dd <- read.csv("Accidents5000Reduit.csv")                   #revisar si s'ha de canviar el nom per un altre .CSV
+dd <- readRDS("dd.rds")
 
 ```
 
@@ -61,67 +61,57 @@ Decide if you need to declare some more factor or date
 
 ```{r}
 
-# descriptiva<-function(X, nom){
-#   if (!(is.numeric(X) || class(X)=="Date")){ 
-#     frecs<-table(as.factor(X), useNA="ifany")
-#     proportions<-frecs/n
-#     #ojo, decidir si calcular porcentages con o sin missing values
-#     pie(frecs, cex=0.6, main=paste("Pie of", nom))
-#     barplot(frecs, las=3, cex.names=0.7, main=paste("Barplot of", nom), col=listOfColors)
-#     print(paste("Number of modalities: ", length(frecs)))
-#     print("Frequency table")
-#     print(frecs)
-#     print("Relative frequency table (proportions)")
-#     print(proportions)
-#     print("Frequency table sorted")
-#     print(sort(frecs, decreasing=TRUE))
-#     print("Relative frequency table (proportions) sorted")
-#     print(sort(proportions, decreasing=TRUE))
-#    }else{
-#      if(class(X)=="Date"){
-#        print(summary(X))
-#        print(sd(X))
-#        #decide breaks: weeks, months, quarters...
-#        hist(X,breaks="weeks")
-#      }else{
-#        hist(X, main=paste("Histogram of", nom))
-#        boxplot(X, horizontal=TRUE, main=paste("Boxplot of",nom))
-#        print("Extended Summary Statistics")
-#        print(summary(X))
-#        print(paste("sd: ", sd(X, na.rm=TRUE)))
-#        print(paste("vc: ", sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)))
-#       }
-#    }
-# }
-# 
-# dataset<-dd
-# actives<-c(1:K)
-# colDate<-1
-# if (dataset=="platjaDaro")
-#   {dd[,colDate]<-as.Date(dd[, colDate], format="%d/%m/%y %h:%m:%s")
-#    actives<-c(3:44)
-#    }
-# 
-# ```
-# 
-# 
-# Basic descriptive analysis for numerical variables
-# 
-# (decide the maximum number of colors you can need in a graph based on your metadata file)
-# ```{r, echo=FALSE}
-# listOfColors<-rainbow(39)
-# 
-# par(ask=TRUE)
-# 
-# for(k in actives){
-#   print(paste("variable ", k, ":", names(dd)[k] ))
-#   descriptiva(dd[,k], names(dd)[k])
-# }
-# par(ask=FALSE)
+descriptive<-function(X, nom){
+  if (!(is.numeric(X) || class(X)=="Date")){
+    frecs<-table(as.factor(X), useNA="ifany")
+    proportions<-frecs/n
+    #ojo, decidir si calcular porcentages con o sin missing values
+    pie(frecs, cex=0.6, main=paste("Pie of", nom))
+    barplot(frecs, las=3, cex.names=0.7, main=paste("Barplot of", nom), col=listOfColors)
+    print(paste("Number of modalities: ", length(frecs)))
+    print("Frequency table")
+    print(frecs)
+    print("Relative frequency table (proportions)")
+    print(proportions)
+    print("Frequency table sorted")
+    print(sort(frecs, decreasing=TRUE))
+    print("Relative frequency table (proportions) sorted")
+    print(sort(proportions, decreasing=TRUE))
+   }else{
+     if(class(X)=="Date"){
+       print(summary(X))
+       print(sd(X))
+       #decide breaks: weeks, months, quarters...
+       hist(X, main=paste("Histogram of", nom), breaks="years")
+     }else{
+       hist(X, main=paste("Histogram of", nom))
+       boxplot(X, horizontal=TRUE, main=paste("Boxplot of",nom))
+       print("Extended Summary Statistics")
+       print(summary(X))
+       print(paste("sd: ", sd(X, na.rm=TRUE)))
+       print(paste("vc: ", sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)))
+      }
+   }
+}
 
-#per exportar figures d'R per programa
-#dev.off()
-#png(file=mypath,width = 950, height = 800, units = "px")
-#dev.off()
+```
+
+
+Basic descriptive analysis for numerical variables
+
+(decide the maximum number of colors you can need in a graph based on your metadata file)
+```{r, echo=FALSE}
+listOfColors<-rainbow(39)
+
+dataset<-dd
+actives<-c(1:K)
+
+par(ask=TRUE)
+
+for(k in actives){
+  print(paste("variable ", k, ":", names(dd)[k] ))
+  descriptive(dd[,k], names(dd)[k])
+}
+par(ask=FALSE)
 
 ```
