@@ -1,5 +1,5 @@
 ---
-title: "MarkdownDocument"
+title: "Univariate descriptive statistics of our data"
 author: "Group 5 MD"
 date: "`r Sys.Date()`"
 output: word_document
@@ -12,14 +12,8 @@ output: word_document
 #install.packages("rstudioapi")
 #library("rmarkdown", "rstudioapi")
 ```
-
-
-Here you can write the introduction of your report and include some text that will be transferred to the word file every time you re-run this Markdown
-
-<br>
-
-//Escriure INTRO
-
+\
+In this document, we provide the basic statistics and plots of our accidents database.
 
 <!-- WARNING: data must have been properly declared before (factors, dates...) -->
 
@@ -30,36 +24,33 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy de
 dd <- readRDS("dd.rds")
 
 ```
-
-<!-- Check the type of the R object created for the dataset without including the R instruction in the final document -->
 ```{r, echo=FALSE}
-class(dd)
+#class(dd)
 ```
 
-<br>
-
-First of all, we obtain the dimensions of our accidents dataset:
+\
+Dimensions of our dataset:
 
 ```{r}
 dim(dd)
 n<-dim(dd)[1]
 K<-dim(dd)[2]
 
-n
-K
+K #Number of variables (columns)
+n #Number of instances (rows)
 ```
 
-<br>
-Next, we proceed to check the variables' names:
+\
+Check of the variables' names:
 
 ```{r}
 names(dd)
 ```
 
-<br>
-Decide if you need to declare some more factor or date
+\newpage
+Basic descriptive analysis of our variables:
 
-```{r}
+```{r, echo=FALSE}
 
 descriptive<-function(X, nom){
   if (!(is.numeric(X) || class(X)=="Date")){
@@ -94,13 +85,10 @@ descriptive<-function(X, nom){
    }
 }
 
-```
 
 
-Basic descriptive analysis for numerical variables
+# Decide the maximum number of colors you can need in a graph based on your metadata file
 
-(decide the maximum number of colors you can need in a graph based on your metadata file)
-```{r, echo=FALSE}
 listOfColors<-rainbow(39)
 
 dataset<-dd
@@ -109,8 +97,10 @@ actives<-c(1:K)
 par(ask=TRUE)
 
 for(k in actives){
+
   print(paste("variable ", k, ":", names(dd)[k] ))
   descriptive(dd[,k], names(dd)[k])
+  cat("\n\n\n\n")
 }
 par(ask=FALSE)
 
