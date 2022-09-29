@@ -1,3 +1,4 @@
+
 #CHECKEJA LA INSTALACIO DELS PACKAGES NECESARIS
 list.of.packages <- c("rstudioapi","remotes") #posar els packages que es facin servir
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -205,4 +206,101 @@ dd[,2]<-Date
 sapply(dd, class)
 sapply(dd, levels)
 
+
 write.csv(dd,"before_missings.csv", row.names = FALSE)
+
+#Missing treatment
+
+table(dd$Zone)
+table(dd$Date)
+table(dd$Region)
+table(dd$Prov)
+table(dd$nMortal)
+table(dd$nGraveInj)
+table(dd$nMinorInj)
+table(dd$nInv)
+table(dd$nPedest)
+table(dd$nBikes)
+table(dd$nMotor)
+
+
+table(dd$Vel)
+dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=c(levels(dd$Vel), 'UnknownVel')) #Adds 'UnknownVel' level
+dd$Vel[dd$Vel==999 |dd$Vel==0 | is.na(dd$Vel)]  <- 'UnknownVel' #Moves vel's where it's value is 999 or 0 or NA to 'UnknownVel'
+dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=levels(droplevels(dd$Vel))) #Removes 10 and 999 factors since there aren't used
+
+
+table(dd$Escaped)
+dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=c(levels(dd$Escaped), 'UnknownEscaped')) #Adds 'UnknownEscaped' level
+dd$Escaped[dd$Escaped == "NA"] <- 'UnknownEscaped'#Moves vel's where it's value is NA to 'UnknownEscaped'
+dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=levels(droplevels(dd$Escaped))) #Removes NA factor
+
+#Next missing treatments are the same as Escaped column
+
+table(dd$Weather)
+dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=c(levels(dd$Weather), 'UnknownWeather')) 
+dd$Weather[dd$Weather == "NA"] <- 'UnknownWeather'
+dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=levels(droplevels(dd$Weather))) 
+
+
+table(dd$TrafficInf)
+dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=c(levels(dd$TrafficInf), 'UnknownTrafficInf')) 
+dd$TrafficInf[dd$TrafficInf == "NA"] <- 'UnknownTrafficInf'
+dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=levels(droplevels(dd$TrafficInf))) 
+
+
+table(dd$WeatherInf)
+dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=c(levels(dd$WeatherInf), 'UnknownWeatherInf')) 
+dd$WeatherInf[dd$WeatherInf == "NA"] <- 'UnknownWeatherInf'
+dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=levels(droplevels(dd$WeatherInf))) 
+
+
+table(dd$LightInf)
+dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=c(levels(dd$LightInf), 'UnknownLightInf')) 
+dd$LightInf[dd$LightInf == "NA"] <- 'UnknownLightInf'
+dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=levels(droplevels(dd$LightInf))) 
+
+
+table(dd$VisionInf)
+dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=c(levels(dd$VisionInf), 'UnknownVisionInf')) 
+dd$VisionInf[dd$VisionInf == "NA"] <- 'UnknownVisionInf'
+dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=levels(droplevels(dd$VisionInf))) 
+
+
+table(dd$Intersect)
+
+
+table(dd$Surface)
+dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=c(levels(dd$Surface), 'UnknownSurface')) 
+dd$Surface[dd$Surface == "NA"] <- 'UnknownSurface'
+dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=levels(droplevels(dd$Surface))) 
+
+
+table(dd$DayGroup)
+table(dd$HourGroup)
+table(dd$AccType)
+
+
+#Save of the dataframe
+
+saveRDS(dd, file= "dd.rds")
+dd <- readRDS(file = "dd.rds")
+write.table(dd, file = "Preprocesed.csv", sep = ",", row.names = FALSE, col.names = TRUE)
+
+#Manual analysis about the randomness about our variables with unknown values
+VelNAs <- subset(dd, Vel == "UnknownVel")
+EscapedNAs <- subset(dd, Escaped == 'UnknownEscaped')
+WeatherNAs <- subset(dd, Weather == "UnknownWeather")
+TrafficInfNAs <- subset(dd, TrafficInf == "UnknownTrafficInf")
+WeatherInfNAs <- subset(dd, WeatherInf == "UnknownWeatherInf")
+LightInfNAs <- subset(dd, LightInf == "UnknownLightInf")
+VisionInfNAs <- subset(dd, VisionInf == "UnknownVisionInf")
+SurfaceNAs <- subset(dd, Surface == "UnknownSurface")
+
+
+
+#remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
+#library(naniar)
+#mcar_test(dd) 
+#1a columna: Chi-squared statistic for Little's test, 2a columna:Degrees of freedom used for chi-squared statistic
+#3a columna: P-value for the chi-squared statistic y 4a columna: Number of missing data patterns in the data
