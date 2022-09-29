@@ -18,7 +18,7 @@ names(dd)[names(dd) == "nomDem"] <- "Prov"
 names(dd)[names(dd) == "F_MORTS"] <- "nMortal"
 names(dd)[names(dd) == "F_FERITS_GREUS"] <- "nGraveInj"
 names(dd)[names(dd) == "F_FERITS_LLEUS"] <- "nMinorInj"
-names(dd)[names(dd) == "F_UNITATS_IMPLICADES"] <- "nInv"
+names(dd)[names(dd) == "F_UNITATS_IMPLICADES"] <- "nInvolv"
 names(dd)[names(dd) == "F_VIANANTS_IMPLICADES"] <- "nPedest"
 names(dd)[names(dd) == "F_BICICLETES_IMPLICADES"] <- "nBikes"
 names(dd)[names(dd) == "VEHICLES_MOTOR"] <- "nMotor"
@@ -76,7 +76,7 @@ dd$Region<-tochange$Short[match(dd$Region,tochange$Long)]
 Region     <- factor(dd$Region)
 #dd[,3]<-Region
 #pie(table(Region))
-#barplot(table(Region))
+#barplot(table(Region), las =2)
 summary(Region)
 
 summary(Prov)
@@ -174,9 +174,9 @@ summary(HourGroup)
 summary(AccType)
 #pie(table(AccType))
 #barplot(table(AccType))
-levels(AccType) <- c("Other", "RunOver", "Rollover", "VehicleHitObstacle", "Vehicle/sHitVehicle/s", "NARoadExit")
+levels(AccType) <- c("Other", "RunOver", "Rollover", "HitObstacle", "HitVehicle/s", "NARoadExit")
 #Ordenar levels: 
-AccType <- factor(AccType, ordered=TRUE, levels=c('RunOver', 'Rollover', 'VehicleHitObstacle', 'Vehicle/sHitVehicle/s', 'NARoadExit', 'Other'))
+AccType <- factor(AccType, ordered=TRUE, levels=c('RunOver', 'Rollover', 'HitObstacle', 'HitVehicle/s', 'NARoadExit', 'Other'))
 summary(AccType)
 
 
@@ -205,36 +205,4 @@ dd[,2]<-Date
 sapply(dd, class)
 sapply(dd, levels)
 
-
-
-table(dd$Zone)
-table(dd$Date)
-table(dd$Region)
-table(dd$Prov)
-table(dd$nMortal)
-table(dd$nGraveInj)
-table(dd$nMinorInj)
-table(dd$nInv)
-table(dd$nPedest)
-table(dd$nBikes)
-table(dd$nMotor)
-table(dd$Vel)
-dd$Vel[dd$Vel==999 |dd$Vel==0 ]  <- "NA" 
-table(dd$Escaped)
-table(dd$Weather)
-table(dd$TrafficInf)
-table(dd$WeatherInf)
-table(dd$LightInf)
-table(dd$VisionInf)
-table(dd$Intersect)
-table(dd$Surface)
-table(dd$DayGroup)
-table(dd$HourGroup)
-table(dd$AccType)
-
-remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
-library(naniar)
-mcar_test(dd) 
-#1a columna: Chi-squared statistic for Little's test, 2a columna:Degrees of freedom used for chi-squared statistic
-#3a columna: P-value for the chi-squared statistic y 4a columna: Number of missing data patterns in the data
-
+write.csv(dd,"before_missings.csv", row.names = FALSE)
