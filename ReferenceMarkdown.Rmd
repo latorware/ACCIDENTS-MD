@@ -2,7 +2,7 @@
 title: "Univariate descriptive statistics of our data"
 author: "Group 5 MD"
 date: "`r Sys.Date()`"
-output: word_document
+output: pdf_document
 ---
 
 <!-- Posem echo=FALSE perquè les comandes d'R no s'incloguin en el document final -->
@@ -28,8 +28,7 @@ dd <- readRDS("dd.rds")
 #class(dd)
 ```
 
-\
-Dimensions of our dataset:
+\section{Dimensions of our dataset:}
 
 ```{r}
 dim(dd)
@@ -40,17 +39,19 @@ K #Number of variables (columns)
 n #Number of instances (rows)
 ```
 
-\
-Check of the variables' names:
+\section{Check of the variables' names:}
 
 ```{r}
 names(dd)
 ```
 
 \newpage
-Basic descriptive analysis of our variables:
+\section{Basic descriptive analysis of our variables:}
 
-```{r, echo=FALSE}
+```{r echo = FALSE,  warning=FALSE, results = 'asis', fig.align='center'}
+library(knitr)
+knitr::opts_chunk$set(fig.pos = 'H') #Per tal que els gràfics surtin on toca
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) #Per evitar imprimir els warnings
 
 descriptive<-function(X, nom){
   if (!(is.numeric(X) || class(X)=="Date")){
@@ -59,28 +60,83 @@ descriptive<-function(X, nom){
     #ojo, decidir si calcular porcentages con o sin missing values
     pie(frecs, cex=0.6, main=paste("Pie of", nom))
     barplot(frecs, las=3, cex.names=0.7, main=paste("Barplot of", nom), col=listOfColors)
-    print(paste("Number of modalities: ", length(frecs)))
-    print("Frequency table")
-    print(frecs)
-    print("Relative frequency table (proportions)")
-    print(proportions)
-    print("Frequency table sorted")
-    print(sort(frecs, decreasing=TRUE))
-    print("Relative frequency table (proportions) sorted")
-    print(sort(proportions, decreasing=TRUE))
-   }else{
+    
+    writeLines("\n")
+    writeLines(paste("Number of modalities: ", length(frecs)))
+    
+    # print("Frequency table")
+    # print(frecs)
+    ### print(kable(frecs, col.names = c(nom, "Frequency"), caption=paste(nom, " frequency table")))
+    
+    # print("Frequency table sorted")
+    # print(sort(frecs, decreasing=TRUE))
+    print(kable(sort(frecs, decreasing=TRUE), col.names = c(nom, "Frequency"), caption=paste(nom, " frequency table (sorted)")))
+    
+    # print("Relative frequency table (proportions)")
+    # print(proportions)
+    ### print(kable(proportions, col.names = c(nom, "Proportion"), caption=paste(nom, " relative frequency table (proportions)")))
+    
+    # print("Relative frequency table (proportions) sorted")
+    # print(sort(proportions, decreasing=TRUE))
+    print(kable(sort(proportions, decreasing=TRUE), col.names = c(nom, "Proportion"), caption=paste(nom, " relative frequency table of proportions (sorted)")))
+    
+    }else{
      if(class(X)=="Date"){
-       print(summary(X))
-       print(sd(X))
+       
        #decide breaks: weeks, months, quarters...
-       hist(X, main=paste("Histogram of", nom), breaks="years")
+       hist(X, main=paste("Histogram of", nom), xlab="Year", breaks="years")
+       
+       # tab <- matrix(c(min(X), max(X)), ncol=2, byrow=TRUE)
+       # colnames(tab) <- c('Min.', 'Max.')
+       # rownames(tab) <- c('')
+       # tab <- as.table(tab)
+       # print(kable(tab, caption=paste(nom, " summary")))
+       
+       cat(paste("Min. -> ", min(X)))
+       cat("\n")
+       cat("\n")
+       cat(paste("Max. -> ", max(X)))
+       cat("\\")
+       
      }else{
-       hist(X, main=paste("Histogram of", nom))
+       hist(X, main=paste("Histogram of", nom), xlab=paste("Value of", nom))
        boxplot(X, horizontal=TRUE, main=paste("Boxplot of",nom))
-       print("Extended Summary Statistics")
-       print(summary(X))
-       print(paste("sd: ", sd(X, na.rm=TRUE)))
-       print(paste("vc: ", sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)))
+       
+       summ <-summary(X)
+       
+       tab <- matrix(c(summ[1], summ[2], summ[3], summ[4], summ[5], summ[6], sd(X, na.rm=TRUE), sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)), ncol=8, byrow=TRUE)
+       colnames(tab) <- c('Min.','1st Qu.','Median', 'Mean', '3rd Qu.', 'Max.', 'sd', 'vc.')
+       rownames(tab) <- c('')
+       tab <- as.table(tab)
+       
+       print(kable(tab, caption=paste(nom, " extended Summary Statistics")))
+       
+       # cat("Extended Summary Statistics: ")
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Min. ----> ", summ[1]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("1st Qu. -> ", summ[2]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Median --> ", summ[3]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Mean ----> ", summ[4]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("3rd Qu. -> ", summ[5]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Max. -> ", summ[6]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("sd -> ", sd(X, na.rm=TRUE)))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("vc. -> ", sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)))
+       # cat("\\")
       }
    }
 }
@@ -98,7 +154,9 @@ par(ask=TRUE)
 
 for(k in actives){
 
-  print(paste("variable ", k, ":", names(dd)[k] ))
+  if (k != 1) cat("\\newpage")
+  cat(paste("\\textbf{", "Variable ", k, ":", names(dd)[k], "}" ))
+  cat("\n\n\n\n")
   descriptive(dd[,k], names(dd)[k])
   cat("\n\n\n\n")
 }
