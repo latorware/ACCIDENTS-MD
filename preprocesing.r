@@ -19,7 +19,7 @@ names(dd)[names(dd) == "nomDem"] <- "Prov"
 names(dd)[names(dd) == "F_MORTS"] <- "nMortal"
 names(dd)[names(dd) == "F_FERITS_GREUS"] <- "nGraveInj"
 names(dd)[names(dd) == "F_FERITS_LLEUS"] <- "nMinorInj"
-names(dd)[names(dd) == "F_UNITATS_IMPLICADES"] <- "nInv"
+names(dd)[names(dd) == "F_UNITATS_IMPLICADES"] <- "nInvolv"
 names(dd)[names(dd) == "F_VIANANTS_IMPLICADES"] <- "nPedest"
 names(dd)[names(dd) == "F_BICICLETES_IMPLICADES"] <- "nBikes"
 names(dd)[names(dd) == "VEHICLES_MOTOR"] <- "nMotor"
@@ -66,11 +66,18 @@ summary(Zone)
 levels(Zone) <- c("Road", "Urban")
 summary(Zone)
 
+
+
 summary(Region)
-#pie(table(Region))
-#barplot(table(Region))
-#nomes canviar les que tenen accents
 levels(Region)[22] <- "Moianes"
+dd[,3]<-Region
+table(dd$Region)
+tochange<- PREPROCESSINGjoin <- read.csv("PREPROCESSINGjoin.csv", sep=";")
+dd$Region<-tochange$Short[match(dd$Region,tochange$Long)] 
+Region     <- factor(dd$Region)
+#dd[,3]<-Region
+#pie(table(Region))
+#barplot(table(Region), las =2)
 summary(Region)
 
 summary(Prov)
@@ -168,9 +175,9 @@ summary(HourGroup)
 summary(AccType)
 #pie(table(AccType))
 #barplot(table(AccType))
-levels(AccType) <- c("Other", "RunOver", "Rollover", "VehicleHitObstacle", "Vehicle/sHitVehicle/s", "NARoadExit")
+levels(AccType) <- c("Other", "RunOver", "Rollover", "HitObstacle", "HitVehicle/s", "NARoadExit")
 #Ordenar levels: 
-AccType <- factor(AccType, ordered=TRUE, levels=c('RunOver', 'Rollover', 'VehicleHitObstacle', 'Vehicle/sHitVehicle/s', 'NARoadExit', 'Other'))
+AccType <- factor(AccType, ordered=TRUE, levels=c('RunOver', 'Rollover', 'HitObstacle', 'HitVehicle/s', 'NARoadExit', 'Other'))
 summary(AccType)
 
 
@@ -198,6 +205,9 @@ dd[,2]<-Date
 
 sapply(dd, class)
 sapply(dd, levels)
+
+
+write.csv(dd,"before_missings.csv", row.names = FALSE)
 
 #Missing treatment
 
@@ -275,7 +285,7 @@ table(dd$AccType)
 
 saveRDS(dd, file= "dd.rds")
 dd <- readRDS(file = "dd.rds")
-write.table(dd, file = "Preprocesed.csv", sep = ";", row.names = FALSE, col.names = TRUE)
+write.table(dd, file = "Preprocesed.csv", sep = ",", row.names = FALSE, col.names = TRUE)
 
 #Manual analysis about the randomness about our variables with unknown values
 VelNAs <- subset(dd, Vel == "UnknownVel")
@@ -294,4 +304,3 @@ SurfaceNAs <- subset(dd, Surface == "UnknownSurface")
 #mcar_test(dd) 
 #1a columna: Chi-squared statistic for Little's test, 2a columna:Degrees of freedom used for chi-squared statistic
 #3a columna: P-value for the chi-squared statistic y 4a columna: Number of missing data patterns in the data
-
