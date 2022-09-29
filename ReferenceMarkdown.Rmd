@@ -96,7 +96,12 @@ descriptive<-function(X, nom){
        cat("\n")
        cat("\n")
        cat(paste("Max. -> ", max(X)))
+       cat("\n")
+       cat("\n")
+       cat(paste("Missing values: -> ", sum(is.na(X))))
        cat("\\")
+       
+       
        
      }else{
        hist(X, main=paste("Histogram of", nom), xlab=paste("Value of", nom))
@@ -104,8 +109,8 @@ descriptive<-function(X, nom){
        
        summ <-summary(X)
        
-       tab <- matrix(c(summ[1], summ[2], summ[3], summ[4], summ[5], summ[6], sd(X, na.rm=TRUE), sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)), ncol=8, byrow=TRUE)
-       colnames(tab) <- c('Min.','1st Qu.','Median', 'Mean', '3rd Qu.', 'Max.', 'sd', 'vc.')
+       tab <- matrix(c(summ[1], summ[2], summ[3], summ[4], summ[5], summ[6], sd(X, na.rm=TRUE), sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE), sum(is.na(X))), ncol=9, byrow=TRUE)
+       colnames(tab) <- c('Min.','1st Qu.','Median', 'Mean', '3rd Qu.', 'Max.', 'sd', 'vc.', 'Missing')
        rownames(tab) <- c('')
        tab <- as.table(tab)
        
