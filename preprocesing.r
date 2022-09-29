@@ -275,7 +275,7 @@ table(dd$AccType)
 
 saveRDS(dd, file= "dd.rds")
 dd <- readRDS(file = "dd.rds")
-write.table(dd, file = "Preprocesed.csv", sep = ";", row.names = FALSE, col.names = TRUE)
+write.table(dd, file = "Preprocesed.csv", sep = ",", row.names = FALSE, col.names = TRUE)
 
 #Manual analysis about the randomness about our variables with unknown values
 VelNAs <- subset(dd, Vel == "UnknownVel")
