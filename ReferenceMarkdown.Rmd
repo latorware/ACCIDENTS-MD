@@ -21,7 +21,7 @@ In this document, we provide the basic statistics and plots of our accidents dat
 #READ TABLE
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
-dd <- readRDS("dd.rds")
+dd <- readRDS("before_missings.rds")
 
 ```
 ```{r, echo=FALSE}

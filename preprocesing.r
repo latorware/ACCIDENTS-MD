@@ -207,7 +207,8 @@ sapply(dd, class)
 sapply(dd, levels)
 
 
-write.csv(dd,"before_missings.csv", row.names = FALSE)
+#write.csv(dd,"before_missings.rds", row.names = FALSE)
+saveRDS(dd, file= "before_missings.rds")
 
 #Missing treatment
 
