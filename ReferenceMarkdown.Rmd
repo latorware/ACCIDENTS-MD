@@ -13,7 +13,7 @@ output: pdf_document
 #library("rmarkdown", "rstudioapi")
 ```
 \
-In this document, we provide the basic statistics and plots of our accidents database.
+In this document, we provide the basic statistics and plots of our accidents database before treating the missing values.
 
 <!-- WARNING: data must have been properly declared before (factors, dates...) -->
 
