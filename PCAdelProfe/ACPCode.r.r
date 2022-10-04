@@ -74,7 +74,7 @@ inerProj<- pc1$sdev^2
 inerProj
 totalIner<- sum(inerProj)
 totalIner
-pinerEix<- 100*inerProj/totalIner
+pinerEix<- 100*(inerProj/totalIner)
 pinerEix
 barplot(pinerEix)
 
