@@ -4,7 +4,7 @@
 #Numerical variables do not contain missing values anymore. They have been imputed in preprocessing step
 
 #  READING OUR DATASET - THE VERSION THAT PASSES THE REQUISITES ABOVE
-setwd("C://Users//Marina//ACCIDENTS-MD")
+setwd("C://Users//marina.alapont//Downloads//ACCIDENTS-MD-PCA_Marina//ACCIDENTS-MD-PCA_Marina")
 dd <- read.csv("Preprocesed.csv",header=T);  #Hauriem de llegir d'un rds per mantenir els factors?
 
 #declarar factors?
@@ -52,7 +52,7 @@ sapply(dd, class)
 #attributes(dd)
 
 # VISUALISATION OF DATA
-## PRINCIPAL COMPONENT ANALYSIS OF CONTINcUOUS VARIABLES, WITH Dictamen PROJECTED AS ILLUSTRATIVE
+## PRINCIPAL COMPONENT ANALYSIS OF CONTINUOUS VARIABLES
 ### CREATION OF THE DATA FRAME OF CONTINUOUS VARIABLES
 
 attach(dd)
@@ -69,6 +69,7 @@ numeriques
 dcon <- dd[, numeriques]
 sapply(dcon, class)
 
+############################CREATION OF THE PCAs###############################
 
 # PRINCIPAL COMPONENT ANALYSIS OF dcon
 
@@ -94,7 +95,7 @@ percInerAccum<-100*cumsum(pc1$sdev[1:dim(dcon)[2]]^2)/dim(dcon)[2]
 percInerAccum
 
 # SELECTION OF THE SINGIFICNT DIMENSIONS (keep 80% of total inertia)
-nd = 4 #With 4 dimensions we have the 77% of the inertia
+nd = 4 #With 4 dimensions we have the 77% of the inertia, it is enough 
 
 print(pc1)
 attributes(pc1)
@@ -112,13 +113,15 @@ dim(Psi)
 Psi[2000,]
 
 # STORAGE OF LABELS FOR INDIVIDUALS AND VARIABLES
-
 iden = row.names(dcon)
 etiq = names(dcon)
-ze = rep(0,length(etiq)) # WE WILL NEED THIS VECTOR AFTERWARDS FOR THE GRAPHICS
+ze = rep(0,length(etiq)) # we will need this vector afterwards for the graphics
+
+
+############################PLOTS###############################
+
 
 # PLOT OF INDIVIDUALS
-
 #select your axis
 eje1<-1
 eje2<-2
@@ -130,10 +133,8 @@ axis(side=3, pos= 0, labels = F, col="cyan")
 axis(side=2, pos= 0, labels = F, col="cyan")
 axis(side=4, pos= 0, labels = F, col="cyan")}
 
-#library(rgl)
-#plot3d(Psi[,1],Psi[,2],Psi[,3])
 
-#Projection of variables
+#PROJECTION OF NUMERICAL VARIABLES
 
 Phi = cor(dcon,Psi)
 View(Phi)
@@ -161,26 +162,25 @@ arrows(ze, ze, X, Y, length = 0.07,col="blue")
 text(X,Y,labels=etiq,col="darkblue", cex=0.7)}
 
 
-##############################
 
 # PROJECTION OF ILLUSTRATIVE qualitative variables on individuals' map
 
 #zona
-varcat=as.factor(dd[,1])
-plot(Psi[,1],Psi[,2],col = 1:length(levels(varcat)))
+varcat=dd[,1]
+plot(Psi[,1],Psi[,2],col =varcat)
 axis(side=1, pos= 0, labels = F, col="darkgray")
 axis(side=3, pos= 0, labels = F, col="darkgray")
 axis(side=2, pos= 0, labels = F, col="darkgray")
 axis(side=4, pos= 0, labels = F, col="darkgray")
 legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
 
-# Overproject THE CDG OF  LEVELS OF varcat (zona)
+
+# Overproject THE CDG OF  LEVELS OF varcat
 k<-1 #zona
 
 varcat<-dd[,k]
 fdic1 = tapply(Psi[,eje1],varcat,mean)
 fdic2 = tapply(Psi[,eje2],varcat,mean) 
-#points(fdic1,fdic2,pch=16,col="blue", labels=levels(varcat))
 text(fdic1,fdic2,labels=levels(varcat),col="yellow", cex=0.7)
 
 #Now we project both cdgs of levels of a selected qualitative variable without
@@ -194,8 +194,41 @@ axis(side=4, pos= 0, labels = F, col="cyan")
 
 text(fdic1,fdic2,labels=levels(varcat),col="blue", cex=0.7)
 
+
+###############
 #repetir per les variables que creiem oportu
 
+varcat=dd[,13]
+plot(Psi[,1],Psi[,2],col = varcat)
+axis(side=1, pos= 0, labels = F, col="darkgray")
+axis(side=3, pos= 0, labels = F, col="darkgray")
+axis(side=2, pos= 0, labels = F, col="darkgray")
+axis(side=4, pos= 0, labels = F, col="darkgray")
+legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
+
+varcat=dd[,15]
+plot(Psi[,1],Psi[,2],col = varcat)
+axis(side=1, pos= 0, labels = F, col="darkgray")
+axis(side=3, pos= 0, labels = F, col="darkgray")
+axis(side=2, pos= 0, labels = F, col="darkgray")
+axis(side=4, pos= 0, labels = F, col="darkgray")
+legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
+
+varcat=dd[,16]
+plot(Psi[,1],Psi[,2],col = varcat)
+axis(side=1, pos= 0, labels = F, col="darkgray")
+axis(side=3, pos= 0, labels = F, col="darkgray")
+axis(side=2, pos= 0, labels = F, col="darkgray")
+axis(side=4, pos= 0, labels = F, col="darkgray")
+legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
+
+varcat=dd[,17]
+plot(Psi[,1],Psi[,2],col = varcat)
+axis(side=1, pos= 0, labels = F, col="darkgray")
+axis(side=3, pos= 0, labels = F, col="darkgray")
+axis(side=2, pos= 0, labels = F, col="darkgray")
+axis(side=4, pos= 0, labels = F, col="darkgray")
+legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
 
 #############################
 
@@ -207,6 +240,7 @@ axis(side=1, pos= 0, labels = F, col="cyan")
 axis(side=3, pos= 0, labels = F, col="cyan")
 axis(side=2, pos= 0, labels = F, col="cyan")
 axis(side=4, pos= 0, labels = F, col="cyan")
+
 
 #nominal qualitative variables
 
@@ -240,7 +274,7 @@ legend("bottomleft",names(dd)[dcat],pch=1,col=colors, cex=0.6)
 # Y<-fm*U[,eje2]
 
 
-#NUMERICAL + CENTROIDS OF CATEGORICAL REPRESENTED 
+#PROJECTION OF THE NUMERICAL VARIABLES + CENTROIDS OF CATEGORICAL REPRESENTED 
 
 #represent numerical variables in background
 plot(Psi[,eje1],Psi[,eje2],type="n",xlim=c(-1,1), ylim=c(-3,1))
@@ -298,24 +332,6 @@ legend("topleft",names(dd)[dordi],pch=1,col=colors[1:length(dordi)], cex=0.6)
 
 ##################################
 
-#aixo esta repe, es el que hem fet abans
-
-# PROJECTION OF ILLUSTRATIVE qualitative variables on individuals' map
-
-varcat=dd[,1]
-plot(Psi[,1],Psi[,2],col=varcat)
-axis(side=1, pos= 0, labels = F, col="darkgray")
-axis(side=3, pos= 0, labels = F, col="darkgray")
-axis(side=2, pos= 0, labels = F, col="darkgray")
-axis(side=4, pos= 0, labels = F, col="darkgray")
-legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
-
-
-# Overproject THE CDG OF  LEVELS OF varcat
-fdic1 = tapply(Psi[,1],varcat,mean)
-fdic2 = tapply(Psi[,2],varcat,mean) 
-
-text(fdic1,fdic2,labels=levels(varcat),col="cyan", cex=0.75)
 
 
 
