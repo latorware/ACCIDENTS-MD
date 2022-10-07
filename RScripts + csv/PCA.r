@@ -132,3 +132,4 @@ corrplot(SquareCorSignificant, is.corr=FALSE, title="aaa")
 #- Positively correlated variables are grouped together.
 #- Negatively correlated variables are positioned on opposite sides of the plot origin (opposed quadrants).
 #- The distance between variables and the origin measures the quality of the variables on the factor map. Variables that are away from the origin are well represented on the factor map.
+
