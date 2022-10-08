@@ -331,6 +331,47 @@ LightInfNAs <- subset(dd, LightInf == "UnknownLightInf")
 VisionInfNAs <- subset(dd, VisionInf == "UnknownVisionInf")
 SurfaceNAs <- subset(dd, Surface == "UnknownSurface")
 
+#Change Unknown names to make it shorter
+
+dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=c(levels(dd$Vel), 'UnkVel')) #Adds 'UnknVel' level
+dd$Vel[dd$Vel=='UnknownVel']  <- 'UnkVel' #Moves vel's where it's value is 999 or 0 or NA to 'UnknownVel'
+dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=levels(droplevels(dd$Vel))) #Removes 10 and 999 factors since there aren't used
+table(dd$Vel)
+
+dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=c(levels(dd$Escaped), 'UnkEsc')) #Adds 'UnknownEscaped' level
+dd$Escaped[dd$Escaped == "UnknownEscaped"] <- 'UnkEsc'#Moves vel's where it's value is NA to 'UnknownEscaped'
+dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=levels(droplevels(dd$Escaped))) #Removes NA factor
+table(dd$Escaped)
+
+dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=c(levels(dd$Weather), 'UnkWth')) 
+dd$Weather[dd$Weather == 'UnknownWeather'] <- 'UnkWth'
+dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=levels(droplevels(dd$Weather))) 
+table(dd$Weather)
+
+dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=c(levels(dd$TrafficInf), 'UnkTrafInf')) 
+dd$TrafficInf[dd$TrafficInf == 'UnknownTrafficInf'] <- 'UnkTrafInf'
+dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=levels(droplevels(dd$TrafficInf))) 
+table(dd$TrafficInf)
+
+dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=c(levels(dd$WeatherInf), 'UnkWthInf')) 
+dd$WeatherInf[dd$WeatherInf == 'UnknownWeatherInf'] <- 'UnkWthInf'
+dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=levels(droplevels(dd$WeatherInf))) 
+table(dd$WeatherInf)
+
+dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=c(levels(dd$LightInf), 'UnkLightInf')) 
+dd$LightInf[dd$LightInf == 'UnknownLightInf'] <- 'UnkLightInf'
+dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=levels(droplevels(dd$LightInf))) 
+table(dd$LightInf)
+
+dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=c(levels(dd$VisionInf), 'UnkVisInf')) 
+dd$VisionInf[dd$VisionInf == 'UnknownVisionInf'] <- 'UnkVisInf'
+dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=levels(droplevels(dd$VisionInf))) 
+table(dd$VisionInf)
+
+dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=c(levels(dd$Surface), 'UnkSrfc')) 
+dd$Surface[dd$Surface == 'UnknownSurface'] <- 'UnkSrfc'
+dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=levels(droplevels(dd$Surface))) 
+table(dd$Surface)
 
 
 #remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
