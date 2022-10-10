@@ -133,3 +133,5 @@ corrplot(SquareCorSignificant, is.corr=FALSE, title="aaa")
 #- Negatively correlated variables are positioned on opposite sides of the plot origin (opposed quadrants).
 #- The distance between variables and the origin measures the quality of the variables on the factor map. Variables that are away from the origin are well represented on the factor map.
 
+ggplot(mapping = aes(x=CoordSignificant[, 2],y=CoordSignificant[, 4])) +
+  geom_point(size = 1, alpha = 2/10)
