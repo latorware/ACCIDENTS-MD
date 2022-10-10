@@ -6,9 +6,9 @@
 #source code llibreria factoextra, aixi podem fer les grafiques manualment i el profe ni s'entera: https://rdrr.io/cran/factoextra/api/
 
 ##si hi ha redundancia entre les mostres, i per tant poder disminuir nombre variables
-##Scree plot: mirar dimensions necesaries, nombre necesari de PCAs > 80%. Veure cada PCA la variancia (% info) de les mostres que es capaç de retenir
+##Scree plot: mirar dimensions necesaries, nombre necesari de PCAs > 80%. Veure cada PCA la variancia (% info) de les mostres que es capaï¿½ de retenir
 ##fer el corrplot de la contribucio de cada variable a cada PCA (amb pesos com punts)
-##fer també barplots de les pr
+##fer tambï¿½ barplots de les pr
 ##fer grafic factors amb vectors de variables numeriques (millor si color de cada vector segons la contribucio respecte els dos PCA)
 ##fer grafic factors amb centroides de levels de variables categoriques (biplot)
 
@@ -32,7 +32,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy de
 
 
 #carreguem rds ja que tambe necesitarem els factors pels centroides etc...
-dd <- readRDS(file = "dd.rds")
+dd <- readRDS(file = "Preprocessed.rds")
 
 #carreguem fonts necessaries pels themes a les ggplot
 sysfonts::font_add_google("Roboto Condensed")

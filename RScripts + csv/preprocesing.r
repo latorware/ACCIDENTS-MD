@@ -183,6 +183,25 @@ summary(AccType)
 
 #declarar dates
 Date     <- as.Date(Date, format =  "%d/%m/%Y")
+Date
+
+#crear noves variables i declarar-les com a factors i ordenar
+
+#year
+Year<-format(Date, "%Y")
+Year
+Year <- factor(Year)
+Year <- factor(Year, ordered=TRUE)
+summary(Year)
+
+
+#month
+Month<-format(Date,"%m")
+Month
+Month<- factor(Month)
+levels(Month) <- c("Jan.", "Feb.", "March", "April", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec.")
+Month <- factor(Month, ordered=TRUE, levels=c('Jan.', 'Feb.', 'March', 'April', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'))
+summary(Month)
 
 
 #aplicar canvis a dd
@@ -202,6 +221,9 @@ dd[,21]<-DayGroup
 dd[,22]<-HourGroup
 dd[,23]<-AccType
 dd[,2]<-Date
+dd$Month<-Month
+dd$Year<-Year
+
 
 sapply(dd, class)
 sapply(dd, levels)
@@ -229,12 +251,15 @@ table(dd$Vel)
 dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=c(levels(dd$Vel), 'UnknownVel')) #Adds 'UnknownVel' level
 dd$Vel[dd$Vel==999 |dd$Vel==0 | is.na(dd$Vel)]  <- 'UnknownVel' #Moves vel's where it's value is 999 or 0 or NA to 'UnknownVel'
 dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=levels(droplevels(dd$Vel))) #Removes 10 and 999 factors since there aren't used
+table(dd$Vel)
 
 
 table(dd$Escaped)
 dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=c(levels(dd$Escaped), 'UnknownEscaped')) #Adds 'UnknownEscaped' level
 dd$Escaped[dd$Escaped == "NA"] <- 'UnknownEscaped'#Moves vel's where it's value is NA to 'UnknownEscaped'
 dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=levels(droplevels(dd$Escaped))) #Removes NA factor
+table(dd$Escaped)
+
 
 #Next missing treatments are the same as Escaped column
 
@@ -242,30 +267,35 @@ table(dd$Weather)
 dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=c(levels(dd$Weather), 'UnknownWeather')) 
 dd$Weather[dd$Weather == "NA"] <- 'UnknownWeather'
 dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=levels(droplevels(dd$Weather))) 
+table(dd$Weather)
 
 
 table(dd$TrafficInf)
 dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=c(levels(dd$TrafficInf), 'UnknownTrafficInf')) 
 dd$TrafficInf[dd$TrafficInf == "NA"] <- 'UnknownTrafficInf'
 dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=levels(droplevels(dd$TrafficInf))) 
+table(dd$TrafficInf)
 
 
 table(dd$WeatherInf)
 dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=c(levels(dd$WeatherInf), 'UnknownWeatherInf')) 
 dd$WeatherInf[dd$WeatherInf == "NA"] <- 'UnknownWeatherInf'
 dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=levels(droplevels(dd$WeatherInf))) 
+table(dd$WeatherInf)
 
 
 table(dd$LightInf)
 dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=c(levels(dd$LightInf), 'UnknownLightInf')) 
 dd$LightInf[dd$LightInf == "NA"] <- 'UnknownLightInf'
 dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=levels(droplevels(dd$LightInf))) 
+table(dd$LightInf)
 
 
 table(dd$VisionInf)
 dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=c(levels(dd$VisionInf), 'UnknownVisionInf')) 
 dd$VisionInf[dd$VisionInf == "NA"] <- 'UnknownVisionInf'
 dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=levels(droplevels(dd$VisionInf))) 
+table(dd$VisionInf)
 
 
 table(dd$Intersect)
@@ -275,18 +305,21 @@ table(dd$Surface)
 dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=c(levels(dd$Surface), 'UnknownSurface')) 
 dd$Surface[dd$Surface == "NA"] <- 'UnknownSurface'
 dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=levels(droplevels(dd$Surface))) 
+table(dd$Surface)
 
 
 table(dd$DayGroup)
 table(dd$HourGroup)
 table(dd$AccType)
+table(dd$Month)
+table(dd$Year)
 
 
 #Save of the dataframe
 
-saveRDS(dd, file= "dd.rds")
-dd <- readRDS(file = "dd.rds")
-write.table(dd, file = "Preprocesed.csv", sep = ",", row.names = FALSE, col.names = TRUE)
+saveRDS(dd, file= "Preprocessed.rds")
+dd <- readRDS(file = "Preprocessed.rds")
+write.table(dd, file = "Preprocessed.csv", sep = ",", row.names = FALSE, col.names = TRUE)
 
 #Manual analysis about the randomness about our variables with unknown values
 VelNAs <- subset(dd, Vel == "UnknownVel")
@@ -298,6 +331,47 @@ LightInfNAs <- subset(dd, LightInf == "UnknownLightInf")
 VisionInfNAs <- subset(dd, VisionInf == "UnknownVisionInf")
 SurfaceNAs <- subset(dd, Surface == "UnknownSurface")
 
+#Change Unknown names to make it shorter
+
+dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=c(levels(dd$Vel), 'UnkVel')) #Adds 'UnknVel' level
+dd$Vel[dd$Vel=='UnknownVel']  <- 'UnkVel' #Moves vel's where it's value is 999 or 0 or NA to 'UnknownVel'
+dd$Vel <- factor(dd$Vel, ordered=TRUE, levels=levels(droplevels(dd$Vel))) #Removes 10 and 999 factors since there aren't used
+table(dd$Vel)
+
+dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=c(levels(dd$Escaped), 'UnkEsc')) #Adds 'UnknownEscaped' level
+dd$Escaped[dd$Escaped == "UnknownEscaped"] <- 'UnkEsc'#Moves vel's where it's value is NA to 'UnknownEscaped'
+dd$Escaped <- factor(dd$Escaped, ordered=TRUE, levels=levels(droplevels(dd$Escaped))) #Removes NA factor
+table(dd$Escaped)
+
+dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=c(levels(dd$Weather), 'UnkWth')) 
+dd$Weather[dd$Weather == 'UnknownWeather'] <- 'UnkWth'
+dd$Weather <- factor(dd$Weather, ordered=TRUE, levels=levels(droplevels(dd$Weather))) 
+table(dd$Weather)
+
+dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=c(levels(dd$TrafficInf), 'UnkTrafInf')) 
+dd$TrafficInf[dd$TrafficInf == 'UnknownTrafficInf'] <- 'UnkTrafInf'
+dd$TrafficInf <- factor(dd$TrafficInf, ordered=TRUE, levels=levels(droplevels(dd$TrafficInf))) 
+table(dd$TrafficInf)
+
+dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=c(levels(dd$WeatherInf), 'UnkWthInf')) 
+dd$WeatherInf[dd$WeatherInf == 'UnknownWeatherInf'] <- 'UnkWthInf'
+dd$WeatherInf <- factor(dd$WeatherInf, ordered=TRUE, levels=levels(droplevels(dd$WeatherInf))) 
+table(dd$WeatherInf)
+
+dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=c(levels(dd$LightInf), 'UnkLightInf')) 
+dd$LightInf[dd$LightInf == 'UnknownLightInf'] <- 'UnkLightInf'
+dd$LightInf <- factor(dd$LightInf, ordered=TRUE, levels=levels(droplevels(dd$LightInf))) 
+table(dd$LightInf)
+
+dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=c(levels(dd$VisionInf), 'UnkVisInf')) 
+dd$VisionInf[dd$VisionInf == 'UnknownVisionInf'] <- 'UnkVisInf'
+dd$VisionInf <- factor(dd$VisionInf, ordered=TRUE, levels=levels(droplevels(dd$VisionInf))) 
+table(dd$VisionInf)
+
+dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=c(levels(dd$Surface), 'UnkSrfc')) 
+dd$Surface[dd$Surface == 'UnknownSurface'] <- 'UnkSrfc'
+dd$Surface <- factor(dd$Surface, ordered=TRUE, levels=levels(droplevels(dd$Surface))) 
+table(dd$Surface)
 
 
 #remotes::install_github("njtierney/naniar") #https://search.r-project.org/CRAN/refmans/naniar/html/mcar_test.html
