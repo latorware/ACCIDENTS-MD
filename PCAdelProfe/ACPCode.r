@@ -1,20 +1,16 @@
 
-#PREREQUISITES: 
-#factors are properly labelled and reading data makes R to directly recognize them
-#Numerical variables do not contain missing values anymore. They have been imputed in preprocessing step
 
-
-
-list.of.packages <- c("rstudioapi") #posar els packages que es facin servir
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
 
 library("rstudioapi") #posar els packages que es facin servir
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
 
 
-#  READING CREDSCO_BIN
 dd <- read.table("credscoClean.csv",header=T, sep=";");
+
+
+
+#alternatively 
+#dd<- <your-data-frame>
 
 objects()
 attributes(dd)
@@ -64,7 +60,7 @@ attributes(pc1)
 
 print(pc1)
 
-
+str(pc1)
 
 
 # WHICH PERCENTAGE OF THE TOTAL INERTIA IS REPRESENTED IN SUBSPACES?
@@ -74,7 +70,7 @@ inerProj<- pc1$sdev^2
 inerProj
 totalIner<- sum(inerProj)
 totalIner
-pinerEix<- 100*(inerProj/totalIner)
+pinerEix<- 100*inerProj/totalIner
 pinerEix
 barplot(pinerEix)
 
@@ -112,9 +108,9 @@ ze = rep(0,length(etiq)) # WE WILL NEED THIS VECTOR AFTERWARDS FOR THE GRAPHICS
 # PLOT OF INDIVIDUALS
 
 #select your axis
-eje1<-2
+#eje1<-2
 eje1<-1
-eje2<-3
+#eje2<-3
 eje2<-2
 
 plot(Psi[,eje1],Psi[,eje2])
@@ -124,6 +120,13 @@ axis(side=3, pos= 0, labels = F, col="cyan")
 axis(side=2, pos= 0, labels = F, col="cyan")
 axis(side=4, pos= 0, labels = F, col="cyan")
 
+
+plot(Psi[,eje1],Psi[,eje2], type="n")
+text(Psi[,eje1],Psi[,eje2],labels=iden, cex=0.5)
+axis(side=1, pos= 0, labels = F, col="cyan")
+axis(side=3, pos= 0, labels = F, col="cyan")
+axis(side=2, pos= 0, labels = F, col="cyan")
+axis(side=4, pos= 0, labels = F, col="cyan")
 #library(rgl)
 #plot3d(Psi[,1],Psi[,2],Psi[,3])
 
@@ -161,18 +164,19 @@ text(X,Y,labels=etiq,col="darkblue", cex=0.7)
 # PROJECCI? OF INDIVIDUALS DIFFERENTIATING THE Dictamen
 # (we need a numeric Dictamen to color)
 
-varcat=dd[,1]
+
+varcat=factor(dd[,1])
 plot(Psi[,1],Psi[,2],col=varcat)
 axis(side=1, pos= 0, labels = F, col="darkgray")
 axis(side=3, pos= 0, labels = F, col="darkgray")
 axis(side=2, pos= 0, labels = F, col="darkgray")
 axis(side=4, pos= 0, labels = F, col="darkgray")
-legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
+legend("bottomleft",levels(factor(varcat)),pch=1,col=c(1,2), cex=0.6)
 
 #select your qualitative variable
 k<-1 #dictamen in credsco
 
-varcat<-dd[,k]
+varcat<-factor(dd[,k])
 fdic1 = tapply(Psi[,eje1],varcat,mean)
 fdic2 = tapply(Psi[,eje2],varcat,mean) 
 #points(fdic1,fdic2,pch=16,col="blue", labels=levels(varcat))
@@ -223,7 +227,7 @@ for(k in dcat){
 fdic1 = tapply(Psi[,eje1],dd[,k],mean)
 fdic2 = tapply(Psi[,eje2],dd[,k],mean) 
 
-text(fdic1,fdic2,labels=levels(dd[,k]),col=seguentColor, cex=0.6)
+text(fdic1,fdic2,labels=levels(factor(dd[,k])),col=seguentColor, cex=0.6)
 c<-c+1
 }
 legend("bottomleft",names(dd)[dcat],pch=1,col=colors, cex=0.6)
@@ -235,8 +239,8 @@ legend("bottomleft",names(dd)[dcat],pch=1,col=colors, cex=0.6)
 fm=20
 
 #scale the projected variables
-X<-fm*U[,eje1]
-Y<-fm*U[,eje2]
+#X<-fm*U[,eje1]
+#Y<-fm*U[,eje2]
 
 #represent numerical variables in background
 plot(Psi[,eje1],Psi[,eje2],type="n",xlim=c(-1,1), ylim=c(-3,1))
@@ -259,7 +263,7 @@ for(k in dcat){
   fdic2 = tapply(Psi[,eje2],dd[,k],mean) 
   
   #points(fdic1,fdic2,pch=16,col=seguentColor, labels=levels(dd[,k]))
-  text(fdic1,fdic2,labels=levels(dd[,k]),col=seguentColor, cex=0.6)
+  text(fdic1,fdic2,labels=levels(factor(dd[,k])),col=seguentColor, cex=0.6)
   c<-c+1
 }
 legend("bottomleft",names(dd)[dcat],pch=1,col=colors, cex=0.6)
@@ -270,7 +274,7 @@ legend("bottomleft",names(dd)[dcat],pch=1,col=colors, cex=0.6)
 dordi<-c(8)
 
 
-levels(dd[,dordi[1]])
+levels(factor(dd[,dordi[1]]))
 #reorder modalities: when required
 dd[,dordi[1]] <- factor(dd[,dordi[1]], ordered=TRUE,  levels= c("WorkingTypeUnknown","altres sit","temporal","fixe","autonom"))
 levels(dd[,dordi[1]])
@@ -291,13 +295,151 @@ for(k in dordi){
 }
 legend("topleft",names(dd)[dordi],pch=1,col=colors[1:length(dordi)], cex=0.6)
 
+#using our own colors palette
+# search palettes in internet. One might be https://r-charts.com/es/colores/
+
+colors<-c("red", "blue", "darkgreen", "orange", "violet", "magenta", "pink")
+
+#represent numerical variables in background
+plot(Psi[,eje1],Psi[,eje2],type="n",xlim=c(-1,1), ylim=c(-3,1))
+#plot(X,Y,type="none",xlim=c(min(X,0),max(X,0)))
+axis(side=1, pos= 0, labels = F, col="cyan")
+axis(side=3, pos= 0, labels = F, col="cyan")
+axis(side=2, pos= 0, labels = F, col="cyan")
+axis(side=4, pos= 0, labels = F, col="cyan")
+
+#add projections of numerical variables in background
+arrows(ze, ze, X, Y, length = 0.07,col="lightgray")
+text(X,Y,labels=etiq,col="gray", cex=0.7)
+
+#add centroids
+c<-1
+for(k in dcat){
+  seguentColor<-colors[c]
+  
+  fdic1 = tapply(Psi[,eje1],dd[,k],mean)
+  fdic2 = tapply(Psi[,eje2],dd[,k],mean) 
+  
+  #points(fdic1,fdic2,pch=16,col=seguentColor, labels=levels(dd[,k]))
+  text(fdic1,fdic2,labels=levels(factor(dd[,k])),col=seguentColor, cex=0.6)
+  c<-c+1
+}
+legend("bottomleft",names(dd)[dcat],pch=19,col=colors, cex=0.6)
+
+
+#add ordinal qualitative variables. Ensure ordering is the correct
+
+dordi<-c(8)
+
+
+levels(factor(dd[,dordi[1]]))
+#reorder modalities: when required
+dd[,dordi[1]] <- factor(dd[,dordi[1]], ordered=TRUE,  levels= c("WorkingTypeUnknown","altres sit","temporal","fixe","autonom"))
+levels(dd[,dordi[1]])
+
+c<-1
+col<-length(dcat)+1
+for(k in dordi){
+  seguentColor<-colors[col]
+  fdic1 = tapply(Psi[,eje1],dd[,k],mean)
+  fdic2 = tapply(Psi[,eje2],dd[,k],mean) 
+  
+  #points(fdic1,fdic2,pch=16,col=seguentColor, labels=levels(dd[,k]))
+  #connect modalities of qualitative variables
+  lines(fdic1,fdic2,pch=16,col=seguentColor)
+  text(fdic1,fdic2,labels=levels(dd[,k]),col=seguentColor, cex=0.6)
+  c<-c+1
+  col<-col+1
+}
+legend("topleft",names(dd)[dordi],pch=19,col=colors[col:col+length(dordi)-1], cex=0.6)
+
+
+#Make two complementary factorial maps
+
+colors<-c("red", "blue", "darkgreen", "orange", "violet", "magenta", "pink")
+
+#represent numerical variables in background
+#plot(Psi[,eje1],Psi[,eje2],type="p",xlim=c(-1,1), ylim=c(-3,1), col="lightgray")
+plot(Psi[,eje1],Psi[,eje2],type="n",xlim=c(-1,1), ylim=c(-3,1))
+#plot(X,Y,type="none",xlim=c(min(X,0),max(X,0)))
+axis(side=1, pos= 0, labels = F, col="cyan")
+axis(side=3, pos= 0, labels = F, col="cyan")
+axis(side=2, pos= 0, labels = F, col="cyan")
+axis(side=4, pos= 0, labels = F, col="cyan")
+
+#add projections of numerical variables in background
+arrows(ze, ze, X, Y, length = 0.07,col="lightgray")
+text(X,Y,labels=etiq,col="gray", cex=0.7)
+
+#numerical variables of financial situation
+
+seleccio<-c(4:7,10)
+dconMapa1<-dcon[,seleccio]
+
+#referencia general comu a tots els mapes
+arrows(ze, ze, X, Y, length = 0.07,col="lightgray")
+text(X,Y,labels=etiq,col="gray", cex=0.7)
+
+#represent in the map1
+XMapa1<-Phi[seleccio,eje1]
+YMapa1<-Phi[seleccio,eje2]
+
+arrows(ze, ze, XMapa1, YMapa1, length = 0.07,col="green")
+text(XMapa1,YMapa1,labels=names(dconMapa1),col="green", cex=0.7)
+
+
+#add centroids
+dcatMapa1<-c(7)
+
+c<-1
+for(k in dcatMapa1){
+  seguentColor<-colors[c]
+  
+  fdic1 = tapply(Psi[,eje1],dd[,k],mean)
+  fdic2 = tapply(Psi[,eje2],dd[,k],mean) 
+  
+  #points(fdic1,fdic2,pch=16,col=seguentColor, labels=levels(dd[,k]))
+  text(fdic1,fdic2,labels=levels(factor(dd[,k])),col=seguentColor, cex=0.6)
+  c<-c+1
+}
+legend("bottomleft",names(dd)[dcatMapa1],pch=19,col=colors, cex=0.6)
+
+
+#add ordinal qualitative variables. Ensure ordering is the correct
+
+dordi<-c(8)
+
+
+levels(factor(dd[,dordi[1]]))
+#reorder modalities: when required
+dd[,dordi[1]] <- factor(dd[,dordi[1]], ordered=TRUE,  levels= c("WorkingTypeUnknown","altres sit","temporal","fixe","autonom"))
+levels(dd[,dordi[1]])
+
+c<-1
+col<-length(dcat)+1
+for(k in dordi){
+  seguentColor<-colors[col]
+  fdic1 = tapply(Psi[,eje1],dd[,k],mean)
+  fdic2 = tapply(Psi[,eje2],dd[,k],mean) 
+  
+  #points(fdic1,fdic2,pch=16,col=seguentColor, labels=levels(dd[,k]))
+  #connect modalities of qualitative variables
+  lines(fdic1,fdic2,pch=16,col=seguentColor)
+  text(fdic1,fdic2,labels=levels(dd[,k]),col=seguentColor, cex=0.6)
+  c<-c+1
+  col<-col+1
+}
+legend("topleft",names(dd)[dordi],pch=19,col=colors[col:col+length(dordi)-1], cex=0.6)
+
+
+
 
 
 # PROJECTION OF ILLUSTRATIVE qualitative variables on individuals' map
 # PROJECCI? OF INDIVIDUALS DIFFERENTIATING THE Dictamen
 # (we need a numeric Dictamen to color)
 
-varcat=dd[,1]
+varcat=factor(dd[,1])
 plot(Psi[,1],Psi[,2],col=varcat)
 axis(side=1, pos= 0, labels = F, col="darkgray")
 axis(side=3, pos= 0, labels = F, col="darkgray")
@@ -310,7 +452,7 @@ legend("bottomleft",levels(varcat),pch=1,col=c(1,2), cex=0.6)
 fdic1 = tapply(Psi[,1],varcat,mean)
 fdic2 = tapply(Psi[,2],varcat,mean) 
 
-text(fdic1,fdic2,labels=levels(varcat),col="cyan", cex=0.75)
+text(fdic1,fdic2,labels=levels(factor(varcat)),col="cyan", cex=0.75)
 
 
 
