@@ -171,7 +171,7 @@ library(cluster)
 
 #dissimilarity matrix
 
-actives<-c(1:23)
+actives<-c(1, 3:25) #We ignore date column because it causes problems
 dissimMatrix <- daisy(dd[,actives], metric = "gower", stand=TRUE)
 
 distMatrix<-dissimMatrix^2
@@ -190,7 +190,20 @@ table(c2)
 #table(c1,c2)
 
 
+ddNoData <- dd
+
+ddNoData$Date=NULL
+
 names(dd)
+
+class(as.matrix(dissimMatrix))
+
+
+install.packages("NbClust")
+library(NbClust)
+
+NbClust(data = ddNoData,diss=as.matrix(dissimMatrix), distance=NULL, min.nc=2, max.nc=20, method = "ward.D",index="silhouette", alphaBeale = 0.1)
+
 
 #MIRAR BOXPLOTS DE LAS VARIABLES MAS INTERESANTES
 
