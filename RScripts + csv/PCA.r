@@ -259,17 +259,23 @@ for (varNumber in factors) {
   
   if(first== 1) {
     first=0
-    levelsMeansQuantityNoRegion = cbind(fx, fy, summary(dd[, varNumber]))
+    levelsMeansQuantityNoRegion = cbind(fx, fy, summary(dd[, varNumber]), colnames(dd)[varNumber])
   }
   else{
     if (colnames(dd)[varNumber] == "Region") {
       levelsMeansQuantityRegion <- cbind(fx, fy, summary(dd[, varNumber]))
     }
     else {
-      levelsMeansQuantityNoRegion <- rbind(levelsMeansQuantityNoRegion, cbind(fx, fy, summary(dd[, varNumber]))) 
+      levelsMeansQuantityNoRegion <- rbind(levelsMeansQuantityNoRegion, cbind(fx, fy, summary(dd[, varNumber]), colnames(dd)[varNumber])) 
     }
   }
 }
+
+levelsMeansQuantityNoRegion<-as.data.frame(levelsMeansQuantityNoRegion)
+levelsMeansQuantityNoRegion[, 1] <- sapply(levelsMeansQuantityNoRegion[, 1], as.numeric)
+levelsMeansQuantityNoRegion[, 2] <- sapply(levelsMeansQuantityNoRegion[, 2], as.numeric)
+levelsMeansQuantityNoRegion[, 3] <- sapply(levelsMeansQuantityNoRegion[, 3], as.numeric)
+levelsMeansQuantityNoRegion[, 4] <- sapply(levelsMeansQuantityNoRegion[, 4], as.factor)
 
 #we are not gonna diplay labels for all the ones that are in the center
 levelsMeansQuantityNoRegionForLabels <- subset(levelsMeansQuantityNoRegion, (sqrt( ((levelsMeansQuantityNoRegion[,1])^2) + ((levelsMeansQuantityNoRegion[,2])^2) ) > 0.2 ))
@@ -277,10 +283,10 @@ levelsMeansQuantityNoRegionForLabels <- subset(levelsMeansQuantityNoRegion, (sqr
 for (x in seq(nd-1)) {  
   for (y in seq(x+1, nd)) {
     actual <- ggplot() +
-      geom_point(mapping = aes(x=levelsMeansQuantityNoRegion[,1], y=levelsMeansQuantityNoRegion[,2], size=levelsMeansQuantityNoRegion[,3])) + 
+      geom_point(mapping = aes(x=levelsMeansQuantityNoRegion[,1], y=levelsMeansQuantityNoRegion[,2], size=levelsMeansQuantityNoRegion[,3], color=levelsMeansQuantityNoRegion[,4])) + 
       geom_segment(aes(x=0, y=0, xend=CorSignificant[, x], yend=CorSignificant[, y])
                    , arrow=arrow(length=unit(0.3,"cm")), alpha=1, size=0.8)+
-      # geom_text_repel(mapping = aes(x=CorSignificant[, x],y=CorSignificant[, y]), label = rownames(CorSignificant)) +
+      geom_text_repel(mapping = aes(x=CorSignificant[, x],y=CorSignificant[, y]), label = rownames(CorSignificant)) +
       geom_label_repel(mapping = aes(x=levelsMeansQuantityNoRegionForLabels[,1], y=levelsMeansQuantityNoRegionForLabels[,2]) ,label = rownames(levelsMeansQuantityNoRegionForLabels),
                         box.padding   = 0.35, 
                         point.padding = 0.5,
@@ -304,3 +310,5 @@ for (x in seq(nd-1)) {
 
 
 #SAME AS BEFORE, BUT ONLY WITH REGION LEVELS
+
+sapply(levelsMeansQuantityNoRegion, class)
