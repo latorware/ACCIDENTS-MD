@@ -113,7 +113,7 @@ ggsave("./PCAgraphs/cumScreePlot/cumScreePlot.jpg", plot=cumScreePlot, width = 1
 
 
 # SELECTION OF THE SINGIFICNT DIMENSIONS
-nd = 5
+nd = 4
 
 #coordinates of observations on significant PCAs. Also the calculation of the correlation of the variables to the PCAs
 CoordSignificant = pc1$x[,1:nd]
@@ -248,67 +248,86 @@ for (x in seq(nd-1)) {
 }
 
 
-#CORRELATION CIRCLE, AND ALL THE LEVELS OF ALL THE VARIABLES IN ONE PLOT (but no region levels)
+#CORRELATION CIRCLE, AND ALL THE LEVELS OF ALL THE VARIABLES IN ONE PLOT (one all except region, another one only for region)
 
-first = 1
-
-for (varNumber in factors) {
-  fx <- tapply(CoordSignificant[,1],dd[,varNumber],mean)
-  fy <- tapply(CoordSignificant[,2],dd[,varNumber],mean) 
-  bb <- cbind(fx, fy, summary(dd[, varNumber]))
-  
-  if(first== 1) {
-    first=0
-    levelsMeansQuantityNoRegion = cbind(fx, fy, summary(dd[, varNumber]), colnames(dd)[varNumber])
-  }
-  else{
-    if (colnames(dd)[varNumber] == "Region") {
-      levelsMeansQuantityRegion <- cbind(fx, fy, summary(dd[, varNumber]))
-    }
-    else {
-      levelsMeansQuantityNoRegion <- rbind(levelsMeansQuantityNoRegion, cbind(fx, fy, summary(dd[, varNumber]), colnames(dd)[varNumber])) 
-    }
-  }
-}
-
-levelsMeansQuantityNoRegion<-as.data.frame(levelsMeansQuantityNoRegion)
-levelsMeansQuantityNoRegion[, 1] <- sapply(levelsMeansQuantityNoRegion[, 1], as.numeric)
-levelsMeansQuantityNoRegion[, 2] <- sapply(levelsMeansQuantityNoRegion[, 2], as.numeric)
-levelsMeansQuantityNoRegion[, 3] <- sapply(levelsMeansQuantityNoRegion[, 3], as.numeric)
-levelsMeansQuantityNoRegion[, 4] <- sapply(levelsMeansQuantityNoRegion[, 4], as.factor)
-
-#we are not gonna diplay labels for all the ones that are in the center
-levelsMeansQuantityNoRegionForLabels <- subset(levelsMeansQuantityNoRegion, (sqrt( ((levelsMeansQuantityNoRegion[,1])^2) + ((levelsMeansQuantityNoRegion[,2])^2) ) > 0.2 ))
+dir.create("./PCAgraphs/pcaALLvarCatNoRegion")
+dir.create("./PCAgraphs/pcaALLOnlyRegion")
 
 for (x in seq(nd-1)) {  
   for (y in seq(x+1, nd)) {
+    first = 1
+    
+    for (varNumber in factors) {
+      fx <- tapply(CoordSignificant[,x],dd[,varNumber],mean)
+      fy <- tapply(CoordSignificant[,y],dd[,varNumber],mean) 
+      bb <- cbind(fx, fy, summary(dd[, varNumber]))
+      
+      if(first== 1) {
+        first=0
+        levelsMeansQuantityNoRegion = cbind(fx, fy, summary(dd[, varNumber]), colnames(dd)[varNumber])
+      }
+      else{
+        if (colnames(dd)[varNumber] == "Region") {
+          levelsMeansQuantityRegion <- cbind(fx, fy, summary(dd[, varNumber]))
+        }
+        else {
+          levelsMeansQuantityNoRegion <- rbind(levelsMeansQuantityNoRegion, cbind(fx, fy, summary(dd[, varNumber]), colnames(dd)[varNumber])) 
+        }
+      }
+    }
+    
+    levelsMeansQuantityNoRegion<-as.data.frame(levelsMeansQuantityNoRegion)
+    levelsMeansQuantityNoRegion[, 1] <- sapply(levelsMeansQuantityNoRegion[, 1], as.numeric)
+    levelsMeansQuantityNoRegion[, 2] <- sapply(levelsMeansQuantityNoRegion[, 2], as.numeric)
+    levelsMeansQuantityNoRegion[, 3] <- sapply(levelsMeansQuantityNoRegion[, 3], as.numeric)
+    levelsMeansQuantityNoRegion[, 4] <- sapply(levelsMeansQuantityNoRegion[, 4], as.factor)
+    
+    #we are not gonna diplay labels for all the ones that are in the center
+    levelsMeansQuantityNoRegionForLabels <- subset(levelsMeansQuantityNoRegion, (sqrt( ((levelsMeansQuantityNoRegion[,1])^2) + ((levelsMeansQuantityNoRegion[,2])^2) ) > 0.2 ))
+    levelsMeansQuantityRegionForLabels <- subset(levelsMeansQuantityRegion, (sqrt( ((levelsMeansQuantityRegion[,1])^2) + ((levelsMeansQuantityRegion[,2])^2) ) > 0.2 ))
+    
+    #all no region
     actual <- ggplot() +
       geom_point(mapping = aes(x=levelsMeansQuantityNoRegion[,1], y=levelsMeansQuantityNoRegion[,2], size=levelsMeansQuantityNoRegion[,3], color=levelsMeansQuantityNoRegion[,4])) + 
       geom_segment(aes(x=0, y=0, xend=CorSignificant[, x], yend=CorSignificant[, y])
                    , arrow=arrow(length=unit(0.3,"cm")), alpha=1, size=0.8)+
       geom_text_repel(mapping = aes(x=CorSignificant[, x],y=CorSignificant[, y]), label = rownames(CorSignificant)) +
       geom_label_repel(mapping = aes(x=levelsMeansQuantityNoRegionForLabels[,1], y=levelsMeansQuantityNoRegionForLabels[,2]) ,label = rownames(levelsMeansQuantityNoRegionForLabels),
-                        box.padding   = 0.35, 
-                        point.padding = 0.5,
-                        segment.color = 'grey50') +
-      # geom_text(data=subset(levelsMeansQuantityNoRegion, (((levelsMeansQuantityNoRegion[,1]) > 0.1) & ((levelsMeansQuantityNoRegion[,2]) > 0.1)) | (((levelsMeansQuantityNoRegion[,1]) > 0.1) & ((levelsMeansQuantityNoRegion[,2]) < -0.1)) | (((levelsMeansQuantityNoRegion[,1]) < -0.1) & ((levelsMeansQuantityNoRegion[,2]) < -0.1)) | (((levelsMeansQuantityNoRegion[,1]) < -0.1) & ((levelsMeansQuantityNoRegion[,2]) > 0.1))),
-      #           mapping = aes(x=levelsMeansQuantityNoRegion[,1], y=levelsMeansQuantityNoRegion[,2]) ,label = rownames(levelsMeansQuantityNoRegion)) +
-      
-      # geom_text(
-      #           mapping = aes(x=levelsMeansQuantityNoRegionForLabels[,1], y=levelsMeansQuantityNoRegionForLabels[,2]) ,label = rownames(levelsMeansQuantityNoRegionForLabels)) +
+                       box.padding   = 0.35, 
+                       point.padding = 0.5,
+                       max.overlaps = 50,
+                       segment.color = 'grey50') +
       geom_circle(aes(x0 = 0, y0 = 0, r = 1), color=rgb(0.5,0.5,0.5)) + 
-      labs(title = "Correlation circle", subtitle= "and variables quality (calculated as the sum (for the two PCAs) of the square cosine of the correlation)" , x = paste0("PCA", x, " (", pinerEix[x], ' %)'), y = paste0("PCA", y, " (", pinerEix[y], ' %)'), color="% Overall quality of the variables\non the two PCAs (cos2)") +
+      labs(title = "Correlation circle, and representation of all modalitites of all cat. variables (except Region)", subtitle= "and modality quantities as point sizes" , x = paste0("PCA", x, " (", pinerEix[x], ' %)'), y = paste0("PCA", y, " (", pinerEix[y], ' %)'), color="Color according to\n cateogorical variable", size="Size according to quantity samples\non modalitites") +
       scale_x_continuous(breaks=seq(-100, 100, 0.1), minor_breaks=seq(-100, 100, 0.1)) + 
       scale_y_continuous(breaks=seq(-100, 100, 0.1), minor_breaks=seq(-100, 100, 0.1)) + 
       geom_hline(yintercept=0, linetype="dashed") +
       geom_vline(xintercept=0, linetype="dashed") +
       theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-    print(actual)
+    #print(actual)
+    ggsave(paste0('./PCAgraphs/pcaALLvarCatNoRegion/pcaALLvarCatNoRegionDim', x, "Dim", y, ".jpg"), plot=actual, width = 1650, height = 980, units = "px", dpi=120)
+    
+    
+    #only region
+    actual2 <- ggplot() +
+      geom_point(mapping = aes(x=levelsMeansQuantityRegion[,1], y=levelsMeansQuantityRegion[,2], size=levelsMeansQuantityRegion[,3], color=rownames(levelsMeansQuantityRegion))) + 
+      geom_segment(aes(x=0, y=0, xend=CorSignificant[, x], yend=CorSignificant[, y])
+                   , arrow=arrow(length=unit(0.3,"cm")), alpha=1, size=0.8)+
+      geom_text_repel(mapping = aes(x=CorSignificant[, x],y=CorSignificant[, y]), label = rownames(CorSignificant)) +
+      geom_label_repel(mapping = aes(x=levelsMeansQuantityRegionForLabels[,1], y=levelsMeansQuantityRegionForLabels[,2]) ,label = rownames(levelsMeansQuantityRegionForLabels),
+                       box.padding   = 0.35, 
+                       point.padding = 0,
+                       max.overlaps = 50,
+                       segment.color = 'grey50') +
+      geom_circle(aes(x0 = 0, y0 = 0, r = 1), color=rgb(0.5,0.5,0.5)) + 
+      labs(title = "Correlation circle, and representation of all modalitites of Region cat. variable", subtitle= "and modality quantities as point sizes" , x = paste0("PCA", x, " (", pinerEix[x], ' %)'), y = paste0("PCA", y, " (", pinerEix[y], ' %)'), size="Size according to quantity samples\non modalitites") +
+      scale_x_continuous(breaks=seq(-100, 100, 0.1), minor_breaks=seq(-100, 100, 0.1)) + 
+      scale_y_continuous(breaks=seq(-100, 100, 0.1), minor_breaks=seq(-100, 100, 0.1)) + 
+      geom_hline(yintercept=0, linetype="dashed") +
+      geom_vline(xintercept=0, linetype="dashed") +
+      guides(color = FALSE)  + 
+      theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
+    #print(actual2)
+    ggsave(paste0('./PCAgraphs/pcaALLOnlyRegion/pcaALLOnlyRegionDim', x, "Dim", y, ".jpg"), plot=actual2, width = 1650, height = 980, units = "px", dpi=120)
   }
-  
 }
-
-
-#SAME AS BEFORE, BUT ONLY WITH REGION LEVELS
-
-sapply(levelsMeansQuantityNoRegion, class)
