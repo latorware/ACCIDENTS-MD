@@ -130,10 +130,10 @@ for(k in 1:K){
   if (is.numeric(dades[,k])){ 
     print(paste("Anàlisi per classes de la Variable:", names(dades)[k]))
    
-     png(file = paste("Variable",k,"_1.png",sep=""))
+     jpeg(file = paste("Variable",k,"_1.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
     boxplot(dades[,k]~P, main=paste("Boxplot of", names(dades)[k], "vs", nameP ), horizontal=TRUE)
     dev.off()
-    png(file = paste("Variable",k,"_2.png",sep=""))
+    jpeg(file = paste("Variable",k,"_2.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
     barplot(tapply(dades[[k]], P, mean),main=paste("Means of", names(dades)[k], "by", nameP ))
     abline(h=mean(dades[[k]]))
     legend(0,mean(dades[[k]]),"global mean",bty="n")
@@ -182,11 +182,11 @@ for(k in 1:K){
 
     
       #with legend
-      png(file = paste("Variable",k,"_1.png",sep=""))
+      jpeg(file = paste("Variable",k,"_1.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
       plot(marg,type="l",ylim=c(0,1),main=paste("Prop. of pos & neg by",names(dades)[k]))
       paleta<-rainbow(length(levels(dades[,k])))
       for(c in 1:length(levels(dades[,k]))){lines(colperc[,c],col=paleta[c]) }
-      legend("topright", levels(dades[,k]), col=paleta, lty=2, cex=0.6)
+      legend("topright", levels(dades[,k]), col=paleta, lty=2, cex=1.5)
       dev.off()
       
       
@@ -198,11 +198,11 @@ for(k in 1:K){
 
       
       #with legend
-      png(file = paste("Variable",k,"_2.png",sep=""))
+      jpeg(file = paste("Variable",k,"_2.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
       plot(marg,type="n",ylim=c(0,1),main=paste("Prop. of pos & neg by",names(dades)[k]))
       paleta<-rainbow(length(levels(dades[,k])))
       for(c in 1:length(levels(dades[,k]))){lines(rowperc[,c],col=paleta[c]) }
-      legend("topright", levels(dades[,k]), col=paleta, lty=2, cex=0.6)
+      legend("topright", levels(dades[,k]), col=paleta, lty=2, cex=1.5)
       dev.off()
       
       
@@ -216,10 +216,10 @@ for(k in 1:K){
       for(c in 1:length(levels(as.factor(P)))){lines(rowperc[c,],col=paleta[c]) }
      
       #with legend
-      png(file = paste("Variable",k,"_3.png",sep=""))
+      jpeg(file = paste("Variable",k,"_3.jpeg",sep=""), width = 980, height = 640, units = "px", quality = 100)
       plot(marg,type="l",ylim=c(0,1),main=paste("Prop. of pos & neg by",names(dades)[k]), las=3)
       for(c in 1:length(levels(as.factor(P)))){lines(rowperc[c,],col=paleta[c])}
-      legend("topright", levels(as.factor(P)), col=paleta, lty=2, cex=0.6)
+      legend("topright", levels(as.factor(P)), col=paleta, lty=2, cex=1.5)
       dev.off()
       
       #condicionades a columna 
@@ -228,10 +228,10 @@ for(k in 1:K){
       for(c in 1:length(levels(as.factor(P)))){lines(colperc[c,],col=paleta[c]) }
       
       #with legend
-      png(file = paste("Variable",k,"_4.png",sep=""))
+      jpeg(file = paste("Variable",k,"_4.jpeg",sep=""), width = 980, height = 640, units = "px", quality = 100)
       plot(marg,type="n",ylim=c(0,1),main=paste("Prop. of pos & neg by",names(dades)[k]), las=3)
       for(c in 1:length(levels(as.factor(P)))){lines(colperc[c,],col=paleta[c])}
-      legend("topright", levels(as.factor(P)), col=paleta, lty=2, cex=0.6)
+      legend("topright", levels(as.factor(P)), col=paleta, lty=2, cex=1.5)
       dev.off()
       
       table<-table(dades[,k],P)
@@ -245,17 +245,17 @@ for(k in 1:K){
       paleta<-rainbow(length(levels(dades[,k])))
       barplot(table(dades[,k], as.factor(P)), beside=FALSE,col=paleta )
       
-      png(file = paste("Variable",k,"_5.png",sep=""))
+      jpeg(file = paste("Variable",k,"_5.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
       barplot(table(dades[,k], as.factor(P)), beside=FALSE,col=paleta )
-      legend("topright",levels(as.factor(dades[,k])),pch=1,cex=0.5, col=paleta)
+      legend("topright",levels(as.factor(dades[,k])),pch=1,cex=1.5, col=paleta)
       dev.off()
       
       #diagrames de barres adosades
       barplot(table(dades[,k], as.factor(P)), beside=TRUE,col=paleta )
       
-      png(file = paste("Variable",k,"_6.png",sep=""))
+      jpeg(file = paste("Variable",k,"_6.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
       barplot(table(dades[,k], as.factor(P)), beside=TRUE,col=paleta)
-      legend("topright",levels(as.factor(dades[,k])),pch=1,cex=0.5, col=paleta)
+      legend("topright",levels(as.factor(dades[,k])),pch=1,cex=1.5, col=paleta)
       dev.off()
       
       print("Test Chi quadrat: ")
@@ -281,8 +281,5 @@ for (c in 1:length(levels(as.factor(P)))) {
 
 #saving the dataframe in an external file
 #write.table(dd, file = "credscoClean.csv", sep = ";", na = "NA", dec = ".", row.names = FALSE, col.names = TRUE)
-paste(1:12) # same as as.character(..)
-paste("A", 1:6, sep = "")
-paste("Today is", date())
 
 
