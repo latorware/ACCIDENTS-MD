@@ -21,9 +21,6 @@ attach(dd)
 names(dd)
 
 #EMPEZAMOS AQUI EL HIERARCHICAL xdxdxd
-ddNoData <- dd
-
-ddNoData$Date=NULL
 
 #dissimilarity matrix
 
@@ -270,6 +267,7 @@ for(k in 1:K){
     }
   }
 }#endfor
+
 
 #descriptors de les classes més significatius. Afegir info qualits
 for (c in 1:length(levels(as.factor(P)))) {
