@@ -1,22 +1,4 @@
 
-
-#COSES IMPORTANTS A OBSERVAR DELS PCA
-
-#http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/112-pca-principal-component-analysis-essentials/
-#source code llibreria factoextra, aixi podem fer les grafiques manualment i el profe ni s'entera: https://rdrr.io/cran/factoextra/api/
-
-##si hi ha redundancia entre les mostres, i per tant poder disminuir nombre variables
-##Scree plot: mirar dimensions necesaries, nombre necesari de PCAs > 80%. Veure cada PCA la variancia (% info) de les mostres que es capa� de retenir
-##fer el corrplot de la contribucio de cada variable a cada PCA (amb pesos com punts)
-##fer tamb� barplots de les pr
-##fer grafic factors amb vectors de variables numeriques (millor si color de cada vector segons la contribucio respecte els dos PCA)
-##fer grafic factors amb centroides de levels de variables categoriques (biplot)
-
-
-
-
-
-
 #CHECKEJA LA INSTALACIO DELS PACKAGES NECESARIS
 list.of.packages <- c("rstudioapi","remotes", "ggplot2", "hrbrthemes", "showtext", "jsonlite", "curl", "sysfonts", "corrplot", "ggforce", "ggpubr", "ggrepel", "factoextra", "colorspace", "svglite") #posar els packages que es facin servir
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -74,8 +56,6 @@ totalIner<- sum(inerProj)
 totalIner
 pinerEix<- 100*(inerProj/totalIner)
 pinerEix
-
-#fer grafiques amb ggplot2 perque siguin mes guapes... mirar source code de factoextra
 
 #scree plot
 screePlot <- ggplot(mapping = aes(x=seq_along(pinerEix),y=pinerEix)) +
