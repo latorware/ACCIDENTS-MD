@@ -1,10 +1,11 @@
+#PCA SCRIPT
 
-#CHECKEJA LA INSTALACIO DELS PACKAGES NECESARIS
-list.of.packages <- c("rstudioapi","remotes", "ggplot2", "hrbrthemes", "showtext", "jsonlite", "curl", "sysfonts", "corrplot", "ggforce", "ggpubr", "ggrepel", "factoextra", "colorspace", "svglite") #posar els packages que es facin servir
+#CHECKS IF IT IS NECESSARY TO INSTALL ANY PACKAGE
+list.of.packages <- c("rstudioapi","remotes", "ggplot2", "hrbrthemes", "showtext", "jsonlite", "curl", "sysfonts", "corrplot", "ggforce", "ggpubr", "ggrepel", "factoextra", "colorspace", "svglite")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-library("rstudioapi") #posar els packages que es facin servir
+library("rstudioapi")
 library("ggplot2")
 library("hrbrthemes")
 library("showtext")
@@ -16,14 +17,14 @@ library("factoextra")
 library("colorspace")
 library("svglite")
 
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 dir.create("./PCAgraphs")
 
 
-#carreguem rds ja que tambe necesitarem els factors pels centroides etc...
+#Reading the preprocessed rds file taht contains our dataset with factors declared and missings treated
 dd <- readRDS(file = "Preprocessed.rds")
 
-#carreguem fonts necessaries pels themes a les ggplot
+#obtaining necessary fonts for the ggplots themes
 sysfonts::font_add_google("Roboto Condensed")
 showtext_auto()
 
@@ -48,7 +49,7 @@ attributes(pc1)
 print(pc1)
 
 
-#percentartge of total inertia per subspace
+#Percentatge of total inertia per subspace
 pc1$sdev
 inerProj<- pc1$sdev^2 
 inerProj
@@ -69,6 +70,7 @@ screePlot <- ggplot(mapping = aes(x=seq_along(pinerEix),y=pinerEix)) +
   theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
 
 #print(screePlot)
+#saving the resulting scree plot in a new folder
 dir.create("./PCAgraphs/screePlot")
 ggsave("./PCAgraphs/screePlot/screePplot.jpg", plot=screePlot, width = 1650, height = 980, units = "px", dpi=120)
 
@@ -88,12 +90,13 @@ cumScreePlot <- ggplot(mapping = aes(x=seq_along(AccumPinerEix),y=AccumPinerEix,
   theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
 
 #print(cumScreePlot)
+#saving the resulting cummulative scree plot in a new folder
 dir.create("./PCAgraphs/cumScreePlot")
 ggsave("./PCAgraphs/cumScreePlot/cumScreePlot.jpg", plot=cumScreePlot, width = 1650, height = 980, units = "px", dpi=120)
 
 
 # SELECTION OF THE SINGIFICNT DIMENSIONS
-nd = 4
+nd = 4  # 4 diensions are enough as they hold together a 77% of the inertia.
 
 #coordinates of observations on significant PCAs. Also the calculation of the correlation of the variables to the PCAs
 CoordSignificant = pc1$x[,1:nd]
@@ -119,7 +122,7 @@ savePlotAsImage('./PCAgraphs/qualityVariables/qualityVariables.jpg','jpeg',width
 
 
 
-#Correlation circle (and nothing else)
+#CORRELATION CIRCLE for each combination of principal components
 
 #- Positively correlated variables are grouped together.
 #- Negatively correlated variables are positioned on opposite sides of the plot origin (opposed quadrants).
@@ -141,14 +144,14 @@ for (x in seq(nd-1)) {
             geom_hline(yintercept=0, linetype="dashed") +
             geom_vline(xintercept=0, linetype="dashed") +
             theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-    #print(actual)
+    #saving the resulting plots in a new folder
     ggsave(paste0('./PCAgraphs/corrCircle/corrCircleDim', x, "Dim", y, ".jpg"), plot=actual, width = 1650, height = 980, units = "px", dpi=120)
   }
   
 }
 
 
-# PLOT OF INDIVIDUALS (and nothing else)
+# PLOTS OF INDIVIDUALS for each factorial map obtained
 
 dir.create("./PCAgraphs/individuals")
 
@@ -164,7 +167,7 @@ for (x in seq(nd-1)) {
       geom_hline(yintercept=0, linetype="dashed") +
       geom_vline(xintercept=0, linetype="dashed") +
       theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-    #print(actual)
+    #saving the resulting plots in a folder
     ggsave(paste0('./PCAgraphs/individuals/individualsDim', x, "Dim", y, ".jpg"), plot=actual, width = 1650, height = 980, units = "px", dpi=120)
     
     
@@ -195,7 +198,7 @@ for (x in seq(nd-1)) {
               scale_y_continuous(breaks=seq(-100, 100, 2), minor_breaks=seq(-100, 100, 2)) + 
               labs(title = paste0("Correlation circle, Individuals, and representation of the ",colnames(dd)[varNumber], " categorical variable"), subtitle= "Correlation vectors are scaled for clarity.\nConcentration ellipses (using multivariate normal distribution) are drawn. Mean points for the levels are also drawn." , x = paste0("PCA", x, " (", pinerEix[x], ' %)'), y = paste0("PCA", y, " (", pinerEix[y], ' %)')) +
               theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-      #print(actual)
+      #saving the resulting plots in a new folder
       ggsave(paste0('./PCAgraphs/pcaVarCat/pcaVarCatDim', x, "Dim", y, "_", colnames(dd)[varNumber], ".jpg"), plot=actual, width = 1650, height = 980, units = "px", dpi=120)
     }
   }
@@ -221,14 +224,14 @@ for (x in seq(nd-1)) {
               scale_y_continuous(breaks=seq(-100, 100, 1), minor_breaks=seq(-100, 100, 1), limits = c(-5, 6)) + 
               labs(title = paste0("Correlation circle, Individuals, and representation of the ",colnames(dd)[varNumber], " categorical variable (ZOOMED IN)"), subtitle= "Correlation vectors are scaled for clarity.\nConcentration ellipses (using multivariate normal distribution) are drawn. Mean points for the levels are also drawn." , x = paste0("PCA", x, " (", pinerEix[x], ' %)'), y = paste0("PCA", y, " (", pinerEix[y], ' %)')) +
               theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-      #print(actual)
+      #saving the resulting plots in a new folder
       ggsave(paste0('./PCAgraphs/pcaVarCatZOOM/pcaVarCatZOOMDim', x, "Dim", y, "_", colnames(dd)[varNumber], ".jpg"), plot=actual, width = 1650, height = 980, units = "px", dpi=120)
     }
   }
 }
 
 
-#CORRELATION CIRCLE, AND ALL THE LEVELS OF ALL THE VARIABLES IN ONE PLOT (one all except region, another one only for region)
+#CORRELATION CIRCLE, AND ALL THE LEVELS OF ALL THE VARIABLES IN ONE PLOT (all in one plot except region, that its in another plot for dimensions reasons)
 
 dir.create("./PCAgraphs/pcaALLvarCatNoRegion")
 dir.create("./PCAgraphs/pcaALLOnlyRegion")
@@ -284,7 +287,7 @@ for (x in seq(nd-1)) {
       geom_hline(yintercept=0, linetype="dashed") +
       geom_vline(xintercept=0, linetype="dashed") +
       theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-    #print(actual)
+    #saving the resulting plot
     ggsave(paste0('./PCAgraphs/pcaALLvarCatNoRegion/pcaALLvarCatNoRegionDim', x, "Dim", y, ".jpg"), plot=actual, width = 1650, height = 980, units = "px", dpi=120)
     
     
@@ -307,7 +310,7 @@ for (x in seq(nd-1)) {
       geom_vline(xintercept=0, linetype="dashed") +
       guides(color = FALSE)  + 
       theme_ipsum_rc(base_size=15, plot_title_size = 22, axis_title_size = 13)
-    #print(actual2)
+    #saving the resulting plot
     ggsave(paste0('./PCAgraphs/pcaALLOnlyRegion/pcaALLOnlyRegionDim', x, "Dim", y, ".jpg"), plot=actual2, width = 1650, height = 980, units = "px", dpi=120)
   }
 }
