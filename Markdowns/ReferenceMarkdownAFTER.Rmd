@@ -1,0 +1,181 @@
+---
+title: "Univariate descriptive statistics of our data after missing treatment"
+author: "Group 5 MD"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+<!-- Posem echo=FALSE perquè les comandes d'R no s'incloguin en el document final -->
+
+```{r, echo=FALSE}
+#install.packages("rmarkdown")
+#install.packages("rstudioapi")
+#library("rmarkdown", "rstudioapi")
+```
+\
+In this document, we provide the basic statistics and plots of the affected variables of our accidents database AFTER treating the missing values.
+
+<!-- WARNING: data must have been properly declared before (factors, dates...) -->
+
+```{r, echo=FALSE, results = 'asis'}
+#READ TABLE
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
+dd <- readRDS("dd.rds")
+#dd <- readRDS("before_missings.rds")
+
+```
+```{r, echo=FALSE}
+#class(dd)
+```
+
+<!-- \section{Dimensions of our dataset:} -->
+
+```{r, echo=FALSE, results = 'asis'}
+
+# dim(dd)
+# n<-dim(dd)[1]
+# K<-dim(dd)[2]
+# 
+# K #Number of variables (columns)
+# n #Number of instances (rows)
+```
+
+<!-- \section{Check of the variables' names:} -->
+
+```{r, echo=FALSE, results = 'asis'}
+# names(dd)
+```
+
+\newpage
+\section{Basic descriptive analysis of our variables after missings treatment:}
+
+```{r echo = FALSE,  warning=FALSE, results = 'asis', fig.align='center'}
+library(knitr)
+knitr::opts_chunk$set(fig.pos = 'H') #Per tal que els gràfics surtin on toca
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) #Per evitar imprimir els warnings
+
+  n<-dim(dd)[1]
+  K<-dim(dd)[2]
+
+aff <- c("Vel", "Escaped", "Weather", "TrafficInf", "WeatherInf", "LightInf", "VisionInf", "Surface")
+
+descriptive<-function(X, nom){
+  if (!(is.numeric(X) || class(X)=="Date")){
+    frecs<-table(as.factor(X), useNA="ifany")
+    proportions<-frecs/n
+    #ojo, decidir si calcular porcentages con o sin missing values
+    pie(frecs, cex=0.6, main=paste("Pie of", nom))
+    barplot(frecs, las=3, cex.names=0.7, main=paste("Barplot of", nom), col=listOfColors)
+    
+    writeLines("\n")
+    writeLines(paste("Number of modalities: ", length(frecs)))
+    
+    # print("Frequency table")
+    # print(frecs)
+    ### print(kable(frecs, col.names = c(nom, "Frequency"), caption=paste(nom, " frequency table")))
+    
+    # print("Frequency table sorted")
+    # print(sort(frecs, decreasing=TRUE))
+    print(kable(sort(frecs, decreasing=TRUE), col.names = c(nom, "Frequency"), caption=paste(nom, " frequency table (sorted)")))
+    
+    # print("Relative frequency table (proportions)")
+    # print(proportions)
+    ### print(kable(proportions, col.names = c(nom, "Proportion"), caption=paste(nom, " relative frequency table (proportions)")))
+    
+    # print("Relative frequency table (proportions) sorted")
+    # print(sort(proportions, decreasing=TRUE))
+    print(kable(sort(proportions, decreasing=TRUE), col.names = c(nom, "Proportion"), caption=paste(nom, " relative frequency table of proportions (sorted)")))
+    
+    }else{
+     if(class(X)=="Date"){
+       
+       #decide breaks: weeks, months, quarters...
+       hist(X, main=paste("Histogram of", nom), xlab="Year", breaks="years")
+       
+       # tab <- matrix(c(min(X), max(X)), ncol=2, byrow=TRUE)
+       # colnames(tab) <- c('Min.', 'Max.')
+       # rownames(tab) <- c('')
+       # tab <- as.table(tab)
+       # print(kable(tab, caption=paste(nom, " summary")))
+       
+       cat(paste("Min. -> ", min(X)))
+       cat("\n")
+       cat("\n")
+       cat(paste("Max. -> ", max(X)))
+       cat("\n")
+       cat("\n")
+       cat(paste("Missing values: -> ", sum(is.na(X))))
+       cat("\\")
+       
+       
+       
+     }else{
+       hist(X, main=paste("Histogram of", nom), xlab=paste("Value of", nom))
+       boxplot(X, horizontal=TRUE, main=paste("Boxplot of",nom))
+       
+       summ <-summary(X)
+       
+       tab <- matrix(c(summ[1], summ[2], summ[3], summ[4], summ[5], summ[6], sd(X, na.rm=TRUE), sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE), sum(is.na(X))), ncol=9, byrow=TRUE)
+       colnames(tab) <- c('Min.','1st Qu.','Median', 'Mean', '3rd Qu.', 'Max.', 'sd', 'vc.', 'Missing')
+       rownames(tab) <- c('')
+       tab <- as.table(tab)
+       
+       print(kable(tab, caption=paste(nom, " extended Summary Statistics")))
+       
+       # cat("Extended Summary Statistics: ")
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Min. ----> ", summ[1]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("1st Qu. -> ", summ[2]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Median --> ", summ[3]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Mean ----> ", summ[4]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("3rd Qu. -> ", summ[5]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("Max. -> ", summ[6]))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("sd -> ", sd(X, na.rm=TRUE)))
+       # cat("\n")
+       # cat("\n")
+       # cat(paste("vc. -> ", sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)))
+       # cat("\\")
+      }
+   }
+}
+
+
+
+# Decide the maximum number of colors you can need in a graph based on your metadata file
+
+listOfColors<-rainbow(39)
+
+dataset<-dd
+actives<-c(1:K)
+
+par(ask=TRUE)
+
+for(k in actives){
+  
+  if (names(dd)[k] %in% aff){ #per al missing treatment
+
+  if (k != 12) cat("\\newpage")      #12 EN COMPTES DE 1 PEL MISSINGS TREATMENT
+  cat(paste("\\textbf{", "Variable ", k, ":", names(dd)[k], "}" ))
+  cat("\n\n\n\n")
+  descriptive(dd[,k], names(dd)[k])
+  cat("\n\n\n\n")
+  
+  }
+}
+par(ask=FALSE)
+
+```
