@@ -1,109 +1,100 @@
 ---
-title: "Univariate descriptive statistics of our data"
+title: "Basic statistical descriptive analysis about the accidents dataset"
 author: "Group 5 MD"
-date: "`r Sys.Date()`"
 output: pdf_document
 ---
+\setcounter{page}{24} <!-- Put real page number taking in account PDFs merge -->
+\pagestyle{plain}
 
-<!-- Posem echo=FALSE perquè les comandes d'R no s'incloguin en el document final -->
 
 ```{r, echo=FALSE}
 #install.packages("rmarkdown")
 #install.packages("rstudioapi")
 #library("rmarkdown", "rstudioapi")
 ```
-\
-In this document, we provide the basic statistics and plots of our accidents database before treating the missing values.
 
 <!-- WARNING: data must have been properly declared before (factors, dates...) -->
 
 ```{r, echo=FALSE}
-#READ TABLE
+# READ TABLE
 
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
-dd <- readRDS("before_missings.rds")
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # Path to the script directory
+ddBefore <- readRDS("./rds/before_missings.rds")
+ddAfter <- readRDS("./rds/Preprocessed.rds")
 
-```
-```{r, echo=FALSE}
-#class(dd)
-```
-
-\section{Dimensions of our dataset:}
-
-```{r}
-dim(dd)
-n<-dim(dd)[1]
-K<-dim(dd)[2]
-
-K #Number of variables (columns)
-n #Number of instances (rows)
-```
-
-\section{Check of the variables' names:}
-
-```{r}
-names(dd)
 ```
 
 \newpage
-\section{Basic descriptive analysis of our variables:}
+\section{Univariate analysis}
 
 ```{r echo = FALSE,  warning=FALSE, results = 'asis', fig.align='center'}
 library(knitr)
-knitr::opts_chunk$set(fig.pos = 'H') #Per tal que els gràfics surtin on toca
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) #Per evitar imprimir els warnings
+library(kableExtra)
+knitr::opts_chunk$set(fig.pos = 'H')                    # So that graphics are placed in the right place
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) # To avoid printing warnings
 
-descriptive<-function(X, nom){
+descriptive<-function(X, nom, tabNum){
+  
   if (!(is.numeric(X) || class(X)=="Date")){
     frecs<-table(as.factor(X), useNA="ifany")
+    if(nom != "Month" & nom != "Year") frecs <- sort(frecs, decreasing=TRUE)
     proportions<-frecs/n
-    #ojo, decidir si calcular porcentages con o sin missing values
+    
+    par(mfrow=c(1,2)) # Two plots in a row
     pie(frecs, cex=0.6, main=paste("Pie of", nom))
     barplot(frecs, las=3, cex.names=0.7, main=paste("Barplot of", nom), col=listOfColors)
     
-    writeLines("\n")
-    writeLines(paste("Number of modalities: ", length(frecs)))
+    cat("\\")
+    cat(" \ ")
     
-    # print("Frequency table")
-    # print(frecs)
-    ### print(kable(frecs, col.names = c(nom, "Frequency"), caption=paste(nom, " frequency table")))
+    cat("\\begin{center}")
+    cat(paste("Number of modalities: ", length(frecs)))
+    cat("\\end{center}")
     
-    # print("Frequency table sorted")
-    # print(sort(frecs, decreasing=TRUE))
-    print(kable(sort(frecs, decreasing=TRUE), col.names = c(nom, "Frequency"), caption=paste(nom, " frequency table (sorted)")))
+    cat("\\")
+    cat(" \ ")
+   
+    FaP <- data.frame(frecs, proportions)
+    names(FaP) <- c(nom, "Frequency", "a", "Proportion")
+
+    if (nom != "Month" & nom != "Year") foot <- " frequency and proportion table (sorted)."
+    else foot <- " frequency and proportion table (sorted chronologically)."
     
-    # print("Relative frequency table (proportions)")
-    # print(proportions)
-    ### print(kable(proportions, col.names = c(nom, "Proportion"), caption=paste(nom, " relative frequency table (proportions)")))
-    
-    # print("Relative frequency table (proportions) sorted")
-    # print(sort(proportions, decreasing=TRUE))
-    print(kable(sort(proportions, decreasing=TRUE), col.names = c(nom, "Proportion"), caption=paste(nom, " relative frequency table of proportions (sorted)")))
-    
+      print(kable(subset(FaP, select= -a), align = "c") %>%
+      kable_styling(latex_options = "HOLD_position"))
+      
+      cat("\\begin{center}")
+      cat(paste("\\textbf{ Table 6.", as.character(tabNum), ". }", nom, foot, sep = ""))
+      cat("\\end{center}")
+     
     }else{
      if(class(X)=="Date"){
        
-       #decide breaks: weeks, months, quarters...
+       par(mfrow=c(1,1)) # One plot in a row
+       
+       # Decide breaks: weeks, months, quarters, YEARS...
        hist(X, main=paste("Histogram of", nom), xlab="Year", breaks="years")
        
-       # tab <- matrix(c(min(X), max(X)), ncol=2, byrow=TRUE)
-       # colnames(tab) <- c('Min.', 'Max.')
-       # rownames(tab) <- c('')
-       # tab <- as.table(tab)
-       # print(kable(tab, caption=paste(nom, " summary")))
+       tab <- matrix(c("2010-01-01", "2021-12-30", sum(is.na(X))), ncol=3, byrow=TRUE)
+       colnames(tab) <- c('Min.', 'Max.', 'Missing values')
+       rownames(tab) <- c('')
+       tab <- as.table(tab)
        
-       cat(paste("Min. -> ", min(X)))
-       cat("\n")
-       cat("\n")
-       cat(paste("Max. -> ", max(X)))
-       cat("\n")
-       cat("\n")
-       cat(paste("Missing values: -> ", sum(is.na(X))))
+       
        cat("\\")
+       cat(" \ ")
+
+       print(kable(tab, align = "c", booktabs = TRUE) %>%
+          kable_styling(latex_options = "HOLD_position"))
        
-       
+       cat("\\begin{center}")
+       cat(paste("\\textbf{ Table 6.", as.character(tabNum), ". }", nom, " summary.", sep = ""))
+       cat("\\end{center}")
        
      }else{
+       
+       par(mfrow=c(1,2)) # Two plots in a row
+       
        hist(X, main=paste("Histogram of", nom), xlab=paste("Value of", nom))
        boxplot(X, horizontal=TRUE, main=paste("Boxplot of",nom))
        
@@ -113,58 +104,113 @@ descriptive<-function(X, nom){
        colnames(tab) <- c('Min.','1st Qu.','Median', 'Mean', '3rd Qu.', 'Max.', 'sd', 'vc.', 'Missing')
        rownames(tab) <- c('')
        tab <- as.table(tab)
+        
+       cat("\\")
+       cat(" \ ")
+
+       print(kable(tab, align = "c", booktabs = TRUE) %>%
+          kable_styling(latex_options = "HOLD_position"))
        
-       print(kable(tab, caption=paste(nom, " extended Summary Statistics")))
-       
-       # cat("Extended Summary Statistics: ")
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("Min. ----> ", summ[1]))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("1st Qu. -> ", summ[2]))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("Median --> ", summ[3]))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("Mean ----> ", summ[4]))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("3rd Qu. -> ", summ[5]))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("Max. -> ", summ[6]))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("sd -> ", sd(X, na.rm=TRUE)))
-       # cat("\n")
-       # cat("\n")
-       # cat(paste("vc. -> ", sd(X, na.rm=TRUE)/mean(X, na.rm=TRUE)))
-       # cat("\\")
+       cat("\\begin{center}")
+       cat(paste("\\textbf{ Table 6.", as.character(tabNum), ". }", nom, " extended Summary Statistics.", sep = ""))
+       cat("\\end{center}")
+
       }
    }
 }
 
 
 
-# Decide the maximum number of colors you can need in a graph based on your metadata file
+n<-dim(ddBefore)[1]
+K<-dim(ddBefore)[2]
 
-listOfColors<-rainbow(39)
+# Maximum number of colours
 
-dataset<-dd
-actives<-c(1:K)
+listOfColors<-rainbow(42)
+
+actives<-c(1:25)
+changed<-c("Vel", "Escaped", "Weather", "TrafficInf", "WeatherInf", "LightInf", "VisionInf", "Surface", "Month", "Year")
 
 par(ask=TRUE)
 
+tabNum <- 2
+
 for(k in actives){
 
+  name <- names(ddAfter)[k]
+  
   if (k != 1) cat("\\newpage")
-  cat(paste("\\textbf{", "Variable ", k, ":", names(dd)[k], "}" ))
-  cat("\n\n\n\n")
-  descriptive(dd[,k], names(dd)[k])
-  cat("\n\n\n\n")
+  
+  if (k < 24)
+  {
+    
+    tabNum <- tabNum + 1
+      
+    cat(paste("\\textbf{", "Variable ", k, ":", name, "}" ))
+    cat("\n\n\n\n")
+    descriptive(ddBefore[,k], name, tabNum)
+    cat("\n\n\n\n")
+  }
+  
+  if (name %in% changed)
+  {
+    
+    tabNum <- tabNum + 1
+    
+    cat("\\newpage")
+    
+    if(name != "Month" & name != "Year") cat(paste("\\textbf{", "Variable ", k, ":", name, " (CHANGED in preprocessing)}" ))
+    else cat(paste("\\textbf{", "Variable ", k, ":", name, " (ADDED in preprocessing)}" ))
+      
+    cat("\n\n\n\n")
+    descriptive(ddAfter[,k], name, tabNum)
+    cat("\n\n\n\n")
+  }
+
 }
 par(ask=FALSE)
 
 ```
+
+\newpage
+\section{Bivariate analysis}
+
+```{r echo = FALSE,  warning=FALSE, results = 'asis', fig.align='center'}
+library(knitr)
+library(kableExtra)
+library(scales)
+knitr::opts_chunk$set(fig.pos = 'H')                    # So that graphics are placed in the right place
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) # To avoid printing warnings
+
+for (k in actives)
+{
+  name <- names(ddAfter)[k]
+  
+                              # Create plot of variable vs nMortal
+  if (name != "nMortal") {    plot(ddAfter[,k], ddAfter$nMortal, pch=16, col=alpha('steelblue', 0.6),
+                              main= paste(name, " vs. nMortal"),
+                              xlab=name, ylab='nMortal')
+  
+  if (is.numeric(ddAfter[,k])) cat(paste("Correlation between ", name, " and nMortal: ", cor(ddAfter[,k], ddAfter$nMortal)))
+  }
+  
+                              # Create plot of variable vs nGraveInj
+  if (name != "nGraveInj") {  plot(ddAfter[,k], ddAfter$nGraveInj, pch=16, col=alpha('steelblue', 0.6),
+                              main= paste(name, " vs. nGraveInj"),
+                              xlab=name, ylab='nGraveInj')
+  
+  if (is.numeric(ddAfter[,k])) cat(paste("Correlation between ", name, " and nGraveInj: ", cor(ddAfter[,k], ddAfter$nGraveInj)))
+  }
+  
+                              # Create plot of variable vs nMinorInj
+  if (name != "nMinorInj") {  plot(ddAfter[,k], ddAfter$nMinorInj, pch=16, col=alpha('steelblue', 0.6),
+                              main= paste(name, " vs. nMinorInj"),
+                              xlab=name, ylab='nMinorInj')
+  
+  if (is.numeric(ddAfter[,k])) cat(paste("Correlation between ", name, " and nMinorInj: ", cor(ddAfter[,k], ddAfter$nMinorInj)))
+  }
+  
+}
+
+```
+
