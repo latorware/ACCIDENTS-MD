@@ -1,15 +1,17 @@
-#CHECKEJA LA INSTALACIO DELS PACKAGES NECESARIS
-list.of.packages <- c("rstudioapi","NbClust") #posar els packages que es facin servir
+#SCRIPT WITH THE HIERARCHICAL CLUSTERING METHOD AND THE CLUSTERS PROFILING
+
+#CHECKS IF IT IS NECESSARY TO INSTALL ANY PACKAGE
+list.of.packages <- c("rstudioapi","NbClust") 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
-library("rstudioapi") #posar els packages que es facin servir
+library("rstudioapi")
 library(cluster)
 library(NbClust)
-#Retrieve the data saved AFTER the profiling practice...... this means data already cleaned
 
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #path al dicteroy del script
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
+#Reading the data preprocessed
 dd <- readRDS(file = "Preprocessed.rds")
 names(dd)
 dim(dd)
@@ -20,8 +22,6 @@ attach(dd)
 #set a list of numerical variables
 names(dd)
 
-#EMPEZAMOS AQUI EL HIERARCHICAL xdxdxd
-
 #dissimilarity matrix
 
 actives<-c(1, 3:25) #We ignore date column because it causes problems
@@ -29,13 +29,11 @@ dissimMatrix <- daisy(dd[,actives], metric = "gower", stand=TRUE)
 
 distMatrix<-dissimMatrix^2
 
-h1 <- hclust(distMatrix,method="ward.D2")  # NOTICE THE COST
-#versions noves "ward.D" i abans de plot: par(mar=rep(2,4)) si se quejara de los margenes del plot
-
+h1 <- hclust(distMatrix,method="ward.D2")  # NOTICE THE COST. Using D2 because of better results and expert (professor Dante Conti) recomandation
 
 plot(h1)
 
-
+#Observing KPI's to decide where to cut the tree
 clust <- NbClust(diss=dissimMatrix, distance=NULL, min.nc=2, max.nc=10, method = "ward.D2",index="cindex" , alphaBeale = 0.1)
 clust$All.index #cindex, mclain minimo. silhouette y dunn maximo.
 clust$Best.nc
@@ -49,12 +47,10 @@ clust <- NbClust(diss=dissimMatrix, distance=NULL, min.nc=2, max.nc=10, method =
 clust$All.index #cindex, mclain minimo. silhouette y dunn maximo.
 clust$Best.nc
 
-#k=2 es mejor, pero alomejor hay poco que estudiar. Si los dos centroides spn muy parecidos, no hay mucho que estudiar
-#entonces seria mejor k=5 (en caso que no haya mucho que estudiar)
-#tener en cuenta que dunn si hay muchos clusters le va mejor asi que a los grandes no mucho caso
+#After analyzing the results, k=2 seems the best option if its profiling turns to be very complet
 
 rect.hclust(h1,2)
-c2 <- cutree(h1,2) #cogemos 2 por los KPI anteriores
+c2 <- cutree(h1,2) 
 
 #class sizes 
 table(c2)
@@ -66,14 +62,13 @@ dd$Cluster <- c2
 #PROFILING
 #PROFILING PLOTS
 
-#Calcula els valor test de la variable Xnum per totes les modalitats del factor P
+#Calculates the test values of variable Xnum for each modalities of factor p 
 ValorTestXnum <- function(Xnum,P){
   #freq dis of fac
   nk <- as.vector(table(P)); 
   n <- sum(nk); 
-  #mitjanes x grups
   xk <- tapply(Xnum,P,mean);
-  #valors test
+  # test values
   txk <- (xk-mean(Xnum))/(sd(Xnum)*sqrt((n-nk)/(n*nk))); 
   #p-values
   pxk <- pt(txk,n-1,lower.tail=F);
@@ -92,7 +87,6 @@ ValorTestXquali <- function(P,Xquali){
   pjm <- matrix(data=pj,nrow=dim(pf)[1],ncol=dim(pf)[2], byrow=TRUE);      
   dpf <- pf - pjm; 
   dvt <- sqrt(((1-pk)/(n*pk))%*%t(pj*(1-pj))); 
-  #i hi ha divisions iguals a 0 dona NA i no funciona
   zkj <- dpf
   zkj[dpf!=0]<-dpf[dpf!=0]/dvt[dpf!=0]; 
   pzkj <- pnorm(zkj,lower.tail=F);
@@ -101,23 +95,17 @@ ValorTestXquali <- function(P,Xquali){
 }
 
 
-#source("file")
-#dades contain the dataset
 ddWithoutDate<-c(1, 3:25) #We ignore date column because it causes problems
 dades<-dd[,ddWithoutDate]
-#dades<-dd[filtro,]
-#dades<-df
+
 
 K<-dim(dades)[2]
 par(ask=TRUE)
 
 
 #P must contain the class variable
-#P<-dd[,3]
 P<-c2
-#P<-dd[,18]
 nameP<-"classe"
-#P<-df[,33]
 
 nc<-length(levels(factor(P)))
 nc
@@ -125,11 +113,12 @@ pvalk <- matrix(data=0,nrow=nc,ncol=K, dimnames=list(levels(P),names(dades)))
 nameP<-"Class"
 n<-dim(dades)[1]
 
+#generating the profiling pltos for each variable of the data set except date
+#we are saving the resulting plots in a folder (it will generate the graphs in the folder where this script can be found)
 
 for(k in 1:K){
   if (is.numeric(dades[,k])){ 
     print(paste("Anàlisi per classes de la Variable:", names(dades)[k]))
-   
      jpeg(file = paste("Variable",k,"_1.jpeg",sep=""),width = 980, height = 640, units = "px", quality = 100)
     boxplot(dades[,k]~P, main=paste("Boxplot of", names(dades)[k], "vs", nameP ), horizontal=TRUE)
     dev.off()
@@ -155,7 +144,6 @@ for(k in 1:K){
       #decide breaks: weeks, months, quarters...
       hist(dades[,k],breaks="weeks")
     }else{
-      #qualitatives
       print(paste("Variable", names(dades)[k]))
       table<-table(P,dades[,k])
       #   print("Cross-table")
@@ -166,16 +154,12 @@ for(k in 1:K){
       #  print("Distribucions condicionades a files")
       # print(rowperc)
       
-      #ojo porque si la variable es true o false la identifica amb el tipus Logical i
-      #aquest no te levels, por tanto, coertion preventiva
-      
       dades[,k]<-as.factor(dades[,k])
-      
       
       marg <- table(as.factor(P))/n
       print(append("Categories=",levels(as.factor(dades[,k]))))
       
-      #from next plots, select one of them according to your practical case
+      #from next plots, we are going only to use in our report those that are intereting in our case
       plot(marg,type="l",ylim=c(0,1),main=paste("Prop. of pos & neg by",names(dades)[k]))
       paleta<-rainbow(length(levels(dades[,k])))
       for(c in 1:length(levels(dades[,k]))){lines(colperc[,c],col=paleta[c]) }
@@ -263,13 +247,12 @@ for(k in 1:K){
       
       print("valorsTest:")
       print( ValorTestXquali(P,dades[,k]))
-      #calcular els pvalues de les quali
     }
   }
 }#endfor
 
 
-#descriptors de les classes més significatius. Afegir info qualits
+#Significant descriptors for each class.
 for (c in 1:length(levels(as.factor(P)))) {
   if(!is.na(levels(as.factor(P))[c])){
     print(paste("P.values per class:",levels(as.factor(P))[c]));
@@ -277,9 +260,8 @@ for (c in 1:length(levels(as.factor(P)))) {
   }
 }
 
-#afegir la informacio de les modalitats de les qualitatives a la llista de pvalues i fer ordenacio global
 
-#saving the dataframe in an external file
-#write.table(dd, file = "credscoClean.csv", sep = ";", na = "NA", dec = ".", row.names = FALSE, col.names = TRUE)
-
+#Saving the dataframe
+saveRDS(dd, file= "AccidentsFinalFile.rds")
+write.table(dd, file = "AccidentsFinalFile.csv", sep = ",", row.names = FALSE, col.names = TRUE)
 
